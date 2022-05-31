@@ -1,6 +1,6 @@
 <script>
 export default { 
-    name:"Navbar"
+    name:"LogoutNavbar"
 }
 </script>
 
@@ -11,17 +11,13 @@ export default {
         
           <img src="../../assets/logo/icon-left-font-monochrome-white.svg" alt="logo" class="img-icon bi me-2 p-2" width="160" height="50" />
         
-
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li><router-link  to="/fil-actu" class="nav-link px-2 text-white">Fil d'actualité</router-link></li>
-          <li><routerLink to="/contact" class="nav-link px-2 text-white">Contact</routerLink></li>
+          <li><router-link  to="/profil" class="nav-link px-2 text-white">Profil</router-link></li>
         </ul>
 
-       
-
         <div class="text-end">
-          <router-link to="/"> <button  type="button" class="btn btn-outline-light me-2">Connexion</button></router-link>
-          <router-link to="/signUp"> <button type="button" class="btn btn-warning">Inscription</button></router-link>
+          <router-link to="/"> <button  type="button" class="btn btn-outline-light me-2">Deconnexion</button></router-link>
         </div>
       </div>
     </div>

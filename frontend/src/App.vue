@@ -1,6 +1,6 @@
 <script>
-import LoginVue from './pages/Login.vue'
-import signInVue from './pages/signIn.vue'
+import LoginVue from './views/Login.vue'
+import signInVue from './views/SignUp.vue'
 import NavbarVue from './components/layout/Navbar.vue'
 import SidebarVue from "./components/layout/Sidebar.vue"
 
@@ -18,20 +18,20 @@ export default {
 </script>
 
 <template>
-<NavbarVue></NavbarVue>
+<!-- <navbar-vue></navbar-vue> -->
 <!-- <SidebarVue></SidebarVue> -->
   <router-view></router-view>
 </template>
 
-<style scoped>
+<style>
 p {
-  color: black !important;
+  color: white !important;
 }
 h {
-  color: black !important;
+  color: white !important;
 }
 body {
-  background-color: rgba(171, 170, 169, 0.057) !important;
+ background-color: #FFD7D7 !important;
 }
 
 </style>

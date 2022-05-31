@@ -1,15 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import Login from "../pages/Login.vue";
-import signIn from "../pages/signIn.vue";
-import Forum from "../pages/Forum.vue";
-import contact from "../pages/Contact.vue";
+import Login from "../views/Login.vue";
+import signUp from "../views/SignUp.vue";
+import Forum from "../views/Forum.vue";
+import contact from "../views/Contact.vue";
+import Profil from "../views/profil.vue"
 
 const routes = [
   { path: "/fil-actu", component: Forum },
   { path: "/", component: Login },
-  { path: "/signIn", component: signIn },
+  { path: "/login", component: Login },
+  { path: "/signUp", component: signUp },
   { path: "/contact", component: contact },
+  { path: "/profil", component: Profil },
 ];
 
 const router = createRouter({
