@@ -31,8 +31,8 @@ export default {
                 <div class="row">
                 </div>
                 <div class="row">
-                    <div class="col-md-15 mb-2">
-                        <input type="submit" class="btn btn-warning btn-send  pt-2 btn-block" value="Enregistrer les modification" >
+                    <div class="col-md-15 mb-2 mt-2">
+                        <input type="submit" class="btn btn-warning btn-send  pt-2 btn-block" value="Enregistrer le pseudo" >
                 </div>
                 </div>
                 <div class="row">

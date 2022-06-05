@@ -8,6 +8,7 @@ export default{
         pseudo: '',
         email: '',
         password: '',
+        error: "",
         }
     },
     methods: {
@@ -33,21 +34,27 @@ export default{
                   .then(response2 => response2.json())
                   .then(response2 => {
                     if (response2.error) throw(response2.error)
+                    localStorage.setItem('pseudo', response2.pseudo);
                     localStorage.setItem('userId', response2.userId);
                     localStorage.setItem('token', response2.token);
-                    window.location.href = "/fil-actu"
+                    alert('Utilisateur enregistré')
+                    window.location.href = "/"
                   })
                   .catch(err2 => {
                     alert("erreur lors de l'inscription")
                     console.log("erreur:", err2)
+                    this.error =
+                  "Erreur: Vérifier vos identifiants lors de l'inscription";
                   })
                   console.log(response);
                 })
                 .catch(err => {
                   alert("erreur lors de l'inscription")
                   console.log("erreur:", err)
+                  this.error =
+                  "Erreur: Vérifier vos identifiants lors de l'inscription";
                 })
-        }
+        }, 
     }
 }
 </script>
@@ -58,8 +65,8 @@ export default{
   <form @submit.prevent="signUpUser">
     <img class="img-log d-block mx-auto" src="..\assets\logo\icon-left-font-monochrome-black.png" alt="" width="180" height="180">
      <div class="form-floating">
-      <input type="username" class="form-control" id="username" placeholder="Pseudo" v-model="pseudo" required>
-      <label for="username">Pseudo</label>
+      <input type="pseudo" class="form-control" id="pseudo" placeholder="Pseudo" v-model="pseudo"  required>
+      <label for="pseudo">Pseudo</label>
     </div>
 
     <div class="form-floating">
@@ -68,17 +75,19 @@ export default{
     </div>
 
     <div class="form-floating">
-      <input type="password" class="form-control"  id="password" placeholder="Password" v-model="password" required>
+      <input type="password" class="form-control"  id="password" placeholder="Password"  v-model="password" required>
       <label for="password">Mot de passe</label>
     </div>
 
       <!-- <div class="form-floating">
-      <input type="password2" class="form-control" id="confirm-password" placeholder="confirm-password" v-model="passwordValidate" required>
+      <input type="password2" class="form-control" id="convrm-password" placeholder="confirm-password" v-model="passwordValidate" pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[-+!*$@%_])([-+!*$@%_\w]{8,15})" required>
       <label for="password2">Confirmation mot de passe</label>
     </div> -->
+
     <button class="w-100 btn btn-lg btn-warning"  type="submit">Inscription</button>
+    <p class="my-3 text-danger">{{ error }}</p>
     <div class="text-center font-weight-bold">
-            Avez-vous déja un compte ? <routerLink to="/"> <a href="#" class="color-a" >login</a></routerLink>
+            Avez-vous déja un compte ? <routerLink to="/"> <a href="#" class="color-a">login</a></routerLink>
         </div>
     <p class="mt-2 mb-3 text-center color-text">&copy; Groupomania 2022</p>
   </form>

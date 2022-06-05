@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cryptoJS = require("crypto-js");
-
 const User = require("../models/User");
 const dotenv = require("dotenv").config();
 
@@ -14,6 +13,7 @@ exports.signup = (req, res, next) => {
           cryptoJS.SHA512(process.env.CRYPTO_SECRET_KEY + req.body.email)
         ),
         password: hash,
+        pseudo: req.body.pseudo,
       });
       user
         .save()

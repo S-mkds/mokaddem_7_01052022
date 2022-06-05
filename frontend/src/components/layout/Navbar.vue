@@ -13,7 +13,6 @@ export default {
         
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><router-link  to="/fil-actu" class="nav-link px-2 text-white">Fil d'actualité</router-link></li>
           <li><routerLink to="/contact" class="nav-link px-2 text-white">Contact</routerLink></li>
         </ul>
 

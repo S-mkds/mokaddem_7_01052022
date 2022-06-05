@@ -5,6 +5,7 @@ import { createStore } from "vuex";
 const store = createStore({
   state: {
     authObj: {
+      pseudo: "",
       userId: "",
       token: "",
     },

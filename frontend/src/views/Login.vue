@@ -17,8 +17,9 @@
     <div class="checkbox mb-3">
     </div>
     <button class="w-100 btn btn-lg btn-warning" type="submit">Connexion</button>
+    <p class="my-3 text-danger">{{ error }}</p>
         <div class="text-center font-weight-bold">
-            Crée un compte <routerLink to="/SignUp"> <a href="#" class="font-weight-bold color-a" id="signUp">signin</a></routerLink>
+            Crée un compte <routerLink to="/SignUp"> <a href="#" class="font-weight-bold color-a" id="signUp">signup</a></routerLink>
         </div>
 
     <p class="mt-2 mb-3 text-muted text-center color-text" id="text-copy">&copy; Groupomania 2022</p>
@@ -53,7 +54,7 @@ export default{
           if (res.status === 200) {
             localStorage.setItem("userLogin", JSON.stringify(res.data));
             console.log(res);
-            this.$router.push("/fil-actu");
+            this.$router.push("/forum");
           }
         })
         .catch((err) => {
