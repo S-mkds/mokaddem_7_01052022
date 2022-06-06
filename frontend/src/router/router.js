@@ -4,7 +4,7 @@ import Login from "../views/Login.vue";
 import signUp from "../views/SignUp.vue";
 import Forum from "../views/Forum.vue";
 import contact from "../views/Contact.vue";
-import Profil from "../views/profil.vue";
+import Profil from "../views/Settings.vue";
 
 const routes = [
   { path: "/", component: Login },

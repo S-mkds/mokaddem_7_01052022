@@ -1,13 +1,15 @@
 <script>
 import axios from 'axios';
 import LogoutNav from '../components/layout/LogoutNav.vue';
+import moment from "moment";
 export default {
     name: "Comment",
     components: { LogoutNav },
     data() {
         return {
 
-            date: new Date(),
+            moment: moment,
+            createAt: "",
             likes: [],
             pseudo:"",  
             token: "",
@@ -50,7 +52,20 @@ export default {
         },
         
         // POSTER LE MESSAGES
-
+        postMsg() { 
+            axios.get("http://localhost:3000/api/posts/", {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })  
+            .then(commentary => {
+                console.log(commentary.data);
+            this.commentary = commentary.data
+            })
+                .catch(err => {
+                alert("echec de réception");
+            });
+        },
 
 
         // AFFICHER LES POSTS
@@ -87,7 +102,7 @@ export default {
         },
 
         // POSTER LE COMMENTAIRE
-
+        
         // AFFICHAGE DES COMMENTAIRES
         getAllComment() {
             fetch("http://localhost:3000/api/posts/", {
@@ -119,8 +134,36 @@ export default {
                 .catch((error) => {
                     console.log({ error });
                 });
-            }
+            },
     // LIKER LE POST
+        likePost() {
+            axios.get('http://localhost:3000/api/post/', {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+                })
+                .then(likeData => {
+                    console.log(likeData.data);
+                    this.like = likeDatapseudoId.data
+            })
+            },
+    // AFFICHER LE PSEUDO UTILISATEUR
+        pseudoGet() {
+            axios.get("http://localhost:3000/api/auth/", this.pseudo, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+                .then(pseudoId => {
+                    console.log(pseudoId.data);
+                    this.pseudo = pseudoId.data
+
+                })
+                .catch(err => {
+                    alert("echec de réception");
+                });
+            },
+
 
     // DATE 
 
@@ -136,6 +179,7 @@ export default {
             this.token = userLogin.token;
             this.getAllPosts();
             this.getAllComment();
+            this.postMsg();
         }
         else {
             this.$router.push("/login");
@@ -165,7 +209,7 @@ export default {
 
     <!--  POST HER  -->
 
-    <div class="align-card form-wall" :post="post" v-for="post in posts" v-bind:key="post.id">
+    <div class="align-card form-wall" :post="post" v-for="post in posts" v-bind:value="posts">
         <div class="card mb-3 d-flex p-2 ">
             <div class="card-header">
                 <div class="d-flex gap-2">
@@ -182,7 +226,7 @@ export default {
                 <p class="card-text">{{ commentary }}</p>
 
                 <!-- SET TIME HER -->
-                <p class="card-text"><small class="fst-italic" > {{date}} </small></p>
+                <p class="card-text"><small class="fst-italic" > <!--{{ moment(message.createdAt).fromNow() }} --> date </small></p>
                 <!-- LIKE HER -->
                 <btn class="btn" id="btn-color" v-on:click="PostLike, callgreen" > <img  id="svglike"
                         src="..\assets\logo/like-svgrepo-com.svg" alt="edit" width="40" height="30"> {{like}}</btn>
@@ -190,7 +234,7 @@ export default {
                 <btn class="btn" id="btn-color"> <img src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40"
                         height="30"> </btn>
                 <!-- DELETE HER -->
-                <btn class="btn" id="btn-color" v-on:click="deleteComment"> <img src="..\assets\logo/delete-svgrepo-com.svg" alt="delete"
+                <btn class="btn" id="btn-color" v-on:click.prevent="deleteComment"> <img src="..\assets\logo/delete-svgrepo-com.svg" alt="delete"
                         width="40" height="30"> </btn>
             </div>
 
