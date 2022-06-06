@@ -6,18 +6,21 @@ export default {
     components: { LogoutNav },
     data() {
         return {
-            like: 0,
+
+            date: new Date(),
+            likes: [],
+            pseudo:"",  
+            token: "",
             posts: [],
             newposts: {
                 userId: "",
                 commentary: "",
+                imageUrl:"" || null,
             },
-            token: "",
-            sendposts: {
+            commentposts: {
+                userId: "",
                 commentary: "",
-                image: "",
             },
-            token: "",
         };
     },
     methods: {
@@ -27,6 +30,7 @@ export default {
         callgreen(){
             document.getElementById('svglike').setAttribute('fill', '#ff00ff');
         },
+        // CREATION DU POST
         CreatePost() {
             axios.post("http://localhost:3000/api/posts", this.newposts, {
                 headers: {
@@ -44,6 +48,12 @@ export default {
                 alert("echec de réception");
             });
         },
+        
+        // POSTER LE MESSAGES
+
+
+
+        // AFFICHER LES POSTS
         getAllPosts() {
             fetch("http://localhost:3000/api/posts/", {
                 headers: { Authorization: "bearer " + this.token },
@@ -55,21 +65,82 @@ export default {
                     console.log(data);
                     this.posts = data;
                 });
+        },
+
+        // CREATION DU COMMENTAIRE
+        Createcomment() {
+            axios.post("http://localhost:3000/api/posts", this.commentposts, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+                .then(response => {
+                console.log(response.data);
+                if (!response.data.error) {
+                    alert(response.data.message);
+                    location.reload();
+                }
+            })
+                .catch(err => {
+                alert("echec de réception");
+            });
+        },
+
+        // POSTER LE COMMENTAIRE
+
+        // AFFICHAGE DES COMMENTAIRES
+        getAllComment() {
+            fetch("http://localhost:3000/api/posts/", {
+                headers: { Authorization: "bearer " + this.token },
+            })
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log(data);
+                    this.posts = data;
+                });
+        },
+            
+    
+    // MODIFIER LE POST
+
+    // SUPPRIMER LE POST
+        deleteComment() {
+            axios.delete("http://localhost:3000/api/posts", this.posts, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+                .then(() => {
+                    alert("Votre commentaire a bien été supprimé !");
+                    document.location.reload();
+                })
+                .catch((error) => {
+                    console.log({ error });
+                });
+            }
+    // LIKER LE POST
+
+    // DATE 
+
+
+    
     },
-        
-   },
+
+    // MONTER LES ELEMENTS SI L'UTILISATEUR EST CONNECTEE
     mounted() {
         const userLogin = JSON.parse(localStorage.getItem("userLogin"));
         if (userLogin) {
             this.newposts.userId = userLogin.userId;
             this.token = userLogin.token;
             this.getAllPosts();
+            this.getAllComment();
         }
         else {
             this.$router.push("/login");
         }
     },
-
 }
 
 </script>
@@ -92,48 +163,48 @@ export default {
         </form>
     </div>
 
-    <!--  POST her  -->
+    <!--  POST HER  -->
 
     <div class="align-card form-wall" :post="post" v-for="post in posts" v-bind:key="post.id">
         <div class="card mb-3 d-flex p-2 ">
             <div class="card-header">
                 <div class="d-flex gap-2">
                     <div class="d-flex flex-column">
-                        <p id="name-commentary">{{ pseudo }} pseudo ici</p>
+                        <p id="name-commentary">{{ pseudo }}</p>
                     </div>
                 </div>
             </div>
-            <!-- <img  v-if="comment.image != null"
-          :src="require(`../../../backend/images/comments/${ImageUrl}`)"
-          class="card-img-top" 
-          alt="..."> -->
+            <img  v-if="newposts.imageUrl != null"
+            :src="require(`../../../backend/images/comments/${ImageUrl}`)"
+            class="card-img-top" 
+            alt="...">
             <div class="card-body">
-                <p class="card-text">{{ commentary }} text ici</p>
+                <p class="card-text">{{ commentary }}</p>
 
                 <!-- SET TIME HER -->
-                <p class="card-text"><small class="fst-italic">Last updated 3 mins ago</small></p>
+                <p class="card-text"><small class="fst-italic" > {{date}} </small></p>
                 <!-- LIKE HER -->
-                <btn class="btn" id="btn-color" v-on:click="PostLike"> <img v-on:click="callgreen" id="svglike"
+                <btn class="btn" id="btn-color" v-on:click="PostLike, callgreen" > <img  id="svglike"
                         src="..\assets\logo/like-svgrepo-com.svg" alt="edit" width="40" height="30"> {{like}}</btn>
                 <!-- MODIFY HER -->
                 <btn class="btn" id="btn-color"> <img src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40"
                         height="30"> </btn>
                 <!-- DELETE HER -->
-                <btn class="btn" id="btn-color"> <img src="..\assets\logo/delete-svgrepo-com.svg" alt="delete"
+                <btn class="btn" id="btn-color" v-on:click="deleteComment"> <img src="..\assets\logo/delete-svgrepo-com.svg" alt="delete"
                         width="40" height="30"> </btn>
             </div>
 
-            <!--  RESPONSE her  -->
+            <!--  RESPONSE COMMENT HER  -->
             <div class="d-flex gap-2 p-1 fs- text" id="border-res">
-                <div class="d-flex flex-column gap-1 p-1 comment " id="border-res">
-                    <p class="font-weight-bold" id="name-response">{{ pseudo }} pseudo ici</p>
-                    <p>{{ responsecommentary }} text ici</p>
+                <div  class="d-flex flex-column gap-1 p-1 comment " id="border-res" >
+                    <p class="font-weight-bold" id="name-response">{{ pseudo }}</p>
+                    <p>{{ commentposts.commentary }} test</p>
                 </div>
             </div>
             <div class="d-flex p-1 gap-2">
-                <textarea v-model="responsecommentary" name="textarea" aria-label="Poster une réponse" maxlength="150"
+                <textarea v-model="commentposts.commentary"  name="textarea" aria-label="Poster une réponse" maxlength="150"
                     rows="2" cols="90" id="floatingTextarea" placeholder="Votre Réponse" data-v-133ed8df=""></textarea>
-                <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Envoyer"
+                <input @submit.prevent="Createcomment" class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Envoyer" 
                     aria-label="submit post">
             </div>
         </div>
@@ -142,7 +213,6 @@ export default {
 
 
 <style scoped>
-
 #btn-color { 
     color: white !important;
 }
@@ -152,7 +222,6 @@ export default {
     border-radius: 50%;
 }
 #border-res { 
-   
     border-radius: 5px 5px;
     background-color: #31323c;
 }
@@ -167,7 +236,6 @@ export default {
     width: 100%;
     
 }
-
 #name-response, #name-commentary {
     font-weight: bold;
 }
@@ -187,7 +255,6 @@ export default {
     margin-bottom: 1rem;
     padding: 1rem;
 }
-
 .card { 
     width: 60rem; 
     background-color: #4E5166!important;
@@ -199,5 +266,4 @@ export default {
 .d-flex p:nth-child(1) {
     font-weight: bold;
 }
-
 </style>

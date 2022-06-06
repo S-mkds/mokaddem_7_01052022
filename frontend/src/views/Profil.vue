@@ -2,59 +2,35 @@
 import LogoutNavbar from "../components/layout/LogoutNav.vue";
 export default {
     name: "Profil",
-    components: {LogoutNavbar },
-   
-}
+    components: { LogoutNavbar },
+    data() {
+        return {
+            token: "",
+        };
+    },
+    methods: {
+
+
+        }
+};
+
 </script>
 
 <template>
 <LogoutNavbar></LogoutNavbar>
-<div class="container">
-        <div class=" text-center mt-5 ">
-            <h1>Modifier le pseudo ou supprimer le compte</h1>
-        </div>
-    <div class="row ">
-    <div class="col-lg-7 mx-auto">
-        <div class="card mt-2 mx-auto p-4" id="bg-contact">
-            <div class="card-body" id="bg-contact">
-            <div class = "container">
-            <form id="contact-form" role="form" action="mailto:Groupomania@group.com" method="post" enctype="text/plain" >
-            <div class="controls">
-                <div class="row">
-                    <div class="col-md-15">
-                        <div class="form-group">
-                            <label for="form_name"><p>Pseudo </p></label>
-                            <input id="form_name" type="text" name="name" class="form-control" placeholder="Modifier le pseudo" required="required" data-error="Firstname is required.">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                </div>
-                <div class="row">
-                    <div class="col-md-15 mb-2 mt-2">
-                        <input type="submit" class="btn btn-warning btn-send  pt-2 btn-block" value="Enregistrer le pseudo" >
-                </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-15 mb-2">
-                        <input type="submit" class="btn btn-warning btn-send  pt-2 btn-block" value="Supprimer le compte" >
-                </div>
-                </div>
-        </div>
-         </form>
-        </div>
-            </div>
+
+    <h1>Modifier le pseudo ou supprimer le compte</h1>
+    <div class="d-flex flex-column gap-1 p-1 comment " id="border-res" >
+    <p class="font-weight-bold" id="name-response">{{ pseudo }} test</p>
     </div>
-    </div>
-</div>
-</div>
+    <input @click.prevent="" type="submit" class="btn btn-warning btn-send  pt-2 btn-block" value="Enregistrer le pseudo" >
+    <input type="submit" class="btn btn-warning btn-send  pt-2 btn-block" value="Supprimer le compte" >
+
+
 </template>
 
 <style scoped>
 
-label[data-v-df212a54] {
-    color: white !important
-}
 body {
     font-family: 'Lato', sans-serif;
 }

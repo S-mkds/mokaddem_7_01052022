@@ -65,7 +65,7 @@ export default{
   <form @submit.prevent="signUpUser">
     <img class="img-log d-block mx-auto" src="..\assets\logo\icon-left-font-monochrome-black.png" alt="" width="180" height="180">
      <div class="form-floating">
-      <input type="pseudo" class="form-control" id="pseudo" placeholder="Pseudo" v-model="pseudo"  required>
+      <input type="pseudo" class="form-control" id="pseudo" placeholder="Pseudo" v-model="pseudo"  pattern="[A-Za-z0-9]{4,15}" title="Le pseudo doit contenir au moins 4 à 15 caractères" required>
       <label for="pseudo">Pseudo</label>
     </div>
 
@@ -75,7 +75,7 @@ export default{
     </div>
 
     <div class="form-floating">
-      <input type="password" class="form-control"  id="password" placeholder="Password"  v-model="password" required>
+      <input type="password" class="form-control"  id="password" placeholder="Password"  v-model="password"  pattern="[A-Za-z0-9]{4,15}" title="Le mot de passe doit contenir au moins 4 à 15 caractères, il est conseillé d'utiliser des majuscules ou des chiffres." required>
       <label for="password">Mot de passe</label>
     </div>
 
