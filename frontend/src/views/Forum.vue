@@ -14,12 +14,14 @@ export default {
             pseudo:"",  
             token: "",
             posts: [],
+            comments:[],
             
             newposts: {
                 userId: "",
                 commentary: "",
                 imageUrl:"" || null,
             },
+
             commentposts: {
                 userId: "",
                 commentary: "",
@@ -29,14 +31,14 @@ export default {
     methods: {
 
         // CREATION DU POST
-        CreatePost() {
+        createPost() {
             axios.post("http://localhost:3000/api/posts", this.newposts, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
             })
                 .then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 if (!response.data.error) {
                     alert(response.data.message);
                     location.reload();
@@ -55,7 +57,7 @@ export default {
                 }
             })  
             .then(response => {
-                console.log(response.data); 
+                // console.log(response.data); 
                 this.posts = response.data
                 this.posts.forEach (async (post) => {
                     await axios.get(`http://localhost:3000/api/auth/${post.userId}`, {
@@ -69,7 +71,7 @@ export default {
                     }) 
                     
                 });
-                console.log(this.posts) 
+                // console.log(this.posts) 
             })
                 .catch(err => {
                 alert("echec de réception");
@@ -77,9 +79,8 @@ export default {
         },
 
         // CREATION DES REPONSES COMMENTAIRES
-
-        Createcomment() {
-            axios.post("http://localhost:3000/api/posts", this.commentposts, {
+        createComment() {
+            axios.post("http://localhost:3000/api/comment", this.commentposts, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
@@ -96,16 +97,46 @@ export default {
             });
         },
 
+        // POSTER LE COMMENTAIRE
+        postCommentary() { 
+            axios.get("http://localhost:3000/api/comment/", {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })  
+            .then(response => {
+                console.log(response.data); 
+                this.comments = response.data
+                this.comments.forEach (async (comment) => {
+                    await axios.get(`http://localhost:3000/api/auth/${comment.userId}`, {
+                        headers: {
+                        authorization: "Bearer " + this.token
+                        }
+                    })
+                    .then(response2 => {
+                        comment.user = response2.data
+                        
+                    }) 
+                    
+                });
+                console.log(this.comments) 
+            })
+                .catch(erreur => {
+                alert("echec de réception");
+            });
+        },
+
         // MODIFIER LE POST
 
         // SUPPRIMER LE POST
         deleteComment() {
-            axios.delete("http://localhost:3000/api/posts", this.posts, {
+            axios.delete("http://localhost:3000/api/posts/:id/delete", this.posts, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
             })
-                .then(() => {
+                .then((response) => {
+                    this.delete = response.data
                     alert("Votre commentaire a bien été supprimé !");
                     document.location.reload();
                 })
@@ -113,6 +144,7 @@ export default {
                     console.log({ error });
                 });
             },
+
         // LIKER LE POST
         likePost() {
             axios.get('http://localhost:3000/api/post/', {
@@ -122,7 +154,7 @@ export default {
                 })
                 .then(likeData => {
                     console.log(likeData.data);
-                    this.like = likeDatapseudoId.data
+                    this.like = likeData.data
             })
             },
     },
@@ -133,6 +165,7 @@ export default {
                 this.newposts.userId = userLogin.userId;
                 this.token = userLogin.token;
                 this.postMsg();
+
             }
             else {
                 this.$router.push("/login");
@@ -146,7 +179,7 @@ export default {
     <LogoutNav></LogoutNav>
     <!-- Create NEW POST commentary her -->
     <div class="form-wall container-sm mx-auto d-flex justify-content-center ">
-        <form action="#" method="post" @submit.prevent="CreatePost">
+        <form action="#" method="post" @submit.prevent="createPost">
             <textarea v-model="newposts.commentary" name="textarea" aria-label="Poster un commentaire" maxlength="300"
                 rows="2" cols="80" id="floatingTextarea" placeholder="Votre commentaire"></textarea>
             <br />
@@ -181,29 +214,31 @@ export default {
                 <!-- SET TIME HER -->
                 <p class="card-text"><small class="fst-italic" > {{ moment(post.createdAt).fromNow() }} </small></p>
                 <!-- LIKE HER -->
-                <btn class="btn" id="btn-color" v-on:click="PostLike, callgreen" > <img  id="svglike"
-                        src="..\assets\logo/like-svgrepo-com.svg" alt="edit" width="40" height="30"> {{like}}</btn>
+                <btn class="btn" id="btn-color" > <img  id="svglike"
+                        src="..\assets\logo/like-svgrepo-com.svg" alt="edit" width="40" height="30"> </btn>
                 <!-- MODIFY HER -->
                 <btn class="btn" id="btn-color"> <img src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40"
                         height="30"> </btn>
                 <!-- DELETE HER -->
-                <btn class="btn" id="btn-color" v-on:click.prevent="deleteComment"> <img src="..\assets\logo/delete-svgrepo-com.svg" alt="delete"
+                <btn class="btn" id="btn-color"> <img src="..\assets\logo/delete-svgrepo-com.svg" alt="delete"
                         width="40" height="30"> </btn>
             </div>
 
             <!--  RESPONSE COMMENT HER  -->
-            <div class="d-flex gap-2 p-1 fs- text" id="border-res">
+            <div class="d-flex gap-2 p-1 fs- text" id="border-res" :commen="comment" v-for="comment in comments" v-bind:value="comments">
                 <div  class="d-flex flex-column gap-1 p-1 comment " id="border-res" >
-                    <p class="font-weight-bold" id="name-response">{{ pseudo }}</p>
+                    <p class="font-weight-bold" id="name-response" v-if="comment.user" >{{ comment.user.pseudo }} pseudo</p>
                     <p>{{ commentposts.commentary }} test</p>
                 </div>
             </div>
-            <div class="d-flex p-1 gap-2">
-                <textarea v-model="commentposts.commentary"  name="textarea" aria-label="Poster une réponse" maxlength="150"
+            <form action="#" method="post" @submit.prevent="createComment">
+            <div class="d-flex p-1 gap-2" >
+                <textarea  name="textarea" aria-label="Poster une réponse" maxlength="150"
                     rows="2" cols="90" id="floatingTextarea" placeholder="Votre Réponse" data-v-133ed8df=""></textarea>
-                <input @submit.prevent="Createcomment" class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Envoyer" 
+                <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Envoyer" 
                     aria-label="submit post">
             </div>
+            </form>
         </div>
     </div>
 </template>

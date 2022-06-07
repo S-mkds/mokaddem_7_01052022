@@ -64,8 +64,8 @@ export default{
 <main class="form-signin">
   <form @submit.prevent="signUpUser">
     <img class="img-log d-block mx-auto" src="..\assets\logo\icon-left-font-monochrome-black.png" alt="" width="180" height="180">
-     <div class="form-floating">
-      <input type="pseudo" class="form-control" id="pseudo" placeholder="Pseudo" v-model="pseudo"  pattern="[A-Z]{1}[A-Za-z0-9]{20}" title="Le pseudo doit contenir une majuscule et au moins 1 à 20 caractères" required>
+    <div class="form-floating">
+      <input type="pseudo" class="form-control" id="pseudo" placeholder="Pseudo" v-model="pseudo"  pattern="[A-Z]{1}[A-Za-z0-9]{1,20}" title="Le pseudo doit contenir une majuscule et au moins 1 à 20 caractères" required>
       <label for="pseudo">Pseudo</label>
     </div>
 

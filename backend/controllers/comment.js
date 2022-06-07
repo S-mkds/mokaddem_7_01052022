@@ -1,18 +1,13 @@
-const Post = require("../models/Post");
+const Comment = require("../models/comment.js");
 const fs = require("fs");
 
-exports.createPost = (req, res, next) => {
-  const postObject = req.body;
-  delete postObject._id;
-  const post = new Post({
-    ...postObject,
-    imageUrl: null, // `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
-    likes: 0,
-    dislikes: 0,
-    usersLiked: [" "],
-    usersdisLiked: [" "],
+exports.createComment = (req, res, next) => {
+  const commentObject = req.body;
+  delete commentObject._id;
+  const comment = new Comment({
+    ...commentObject,
   });
-  post
+  comment
     .save()
     .then(() => {
       res.status(201).json({
@@ -26,10 +21,10 @@ exports.createPost = (req, res, next) => {
     });
 };
 
-exports.getAllPosts = (req, res, next) => {
-  Post.find()
-    .then((posts) => {
-      res.status(200).json(posts);
+exports.getAllComments = (req, res, next) => {
+  Comment.find()
+    .then((comments) => {
+      res.status(200).json(comments);
     })
     .catch((error) => {
       res.status(400).json({
@@ -38,12 +33,12 @@ exports.getAllPosts = (req, res, next) => {
     });
 };
 
-exports.getOnePost = (req, res, next) => {
-  Post.findOne({
+exports.getOneComment = (req, res, next) => {
+  Comment.findOne({
     _id: req.params.id,
   })
-    .then((post) => {
-      res.status(200).json(post);
+    .then((comment) => {
+      res.status(200).json(comment);
     })
     .catch((error) => {
       res.status(404).json({
@@ -52,86 +47,15 @@ exports.getOnePost = (req, res, next) => {
     });
 };
 
-exports.modifyPost = (req, res, next) => {
-  const postObject = req.file
-    ? {
-        ...JSON.parse(req.body.post),
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
-        }`,
-      }
-    : { ...req.body };
-  Post.updateOne({ _id: req.params.id }, { ...postObject, _id: req.params.id })
-    .then(() => res.status(200).json({ message: "Post bien modifiée !" }))
-    .catch((error) =>
-      res.status(403).json({ error: error, message: "Requête non autorisée !" })
-    );
-};
-
-exports.deletePost = (req, res, next) => {
-  Post.findOne({ _id: req.params.id })
-    .then((post) => {
-      const filename = post.imageUrl.split("/images/")[1];
+exports.deleteComment = (req, res, next) => {
+  Comment.findOne({ _id: req.params.id })
+    .then((comment) => {
+      const filename = comment.imageUrl.split("/images/")[1];
       fs.unlink(`images/${filename}`, () => {
-        Post.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: "Post supprimée !" }))
+        Comment.deleteOne({ _id: req.params.id })
+          .then(() => res.status(200).json({ message: "Comment supprimée !" }))
           .catch((error) => res.status(400).json({ error }));
       });
     })
     .catch((error) => res.status(500).json({ error }));
-};
-
-exports.likePost = (req, res, next) => {
-  let like = req.body.like;
-  let userId = req.body.userId;
-  let postId = req.params.id;
-  console.log(req.body);
-  switch (like) {
-    case +1:
-      Post.updateOne(
-        { _id: postId },
-        { $push: { usersLiked: userId }, $inc: { likes: +1 } }
-      )
-        .then(() => res.status(200).json({ message: "Like" }))
-        .catch((error) => res.status(400).json({ error }));
-
-      break;
-
-    case 0:
-      Post.findOne({ _id: postId })
-        .then((post) => {
-          if (post.usersLiked.includes(userId)) {
-            Post.updateOne(
-              { _id: postId },
-              { $pull: { usersLiked: userId }, $inc: { likes: -1 } }
-            )
-              .then(() => res.status(200).json({ message: "Neutre" }))
-              .catch((error) => res.status(400).json({ error }));
-          }
-          if (post.usersDisliked.includes(userId)) {
-            Post.updateOne(
-              { _id: postId },
-              { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } }
-            )
-              .then(() => res.status(200).json({ message: "Neutre" }))
-              .catch((error) => res.status(400).json({ error }));
-          }
-        })
-        .catch((error) => res.status(404).json({ error }));
-      break;
-
-    case -1:
-      Post.updateOne(
-        { _id: postId },
-        { $push: { usersDisliked: userId }, $inc: { dislikes: +1 } }
-      )
-        .then(() => {
-          res.status(200).json({ message: "Dislike" });
-        })
-        .catch((error) => res.status(400).json({ error }));
-      break;
-
-    default:
-      console.log(error);
-  }
 };
