@@ -1,4 +1,5 @@
 <script>
+import axios from 'axios';
 import LogoutNavbar from "../components/layout/LogoutNav.vue";
 export default {
     name: "Profil",
@@ -14,10 +15,23 @@ export default {
 
         },
 
-        deleteAccount() {
-
-        }
-
+        deleteUser() {
+            axios.delete("http://localhost:3000/api/auth/", {
+                headers: {Authorization: 'Bearer ' + this.token}})
+            .then(response => {
+                let rep = JSON.parse(response.data);
+                console.log(rep);
+                localStorage.userId = "";
+                localStorage.token = "";
+                localStorage.clear()
+                alert('vous avez été déconnecté')
+                this.$router.push("/login");  
+            })
+            .catch(error => {
+                console.log(error);
+                this.msg = error  
+            })
+        },
         },
 
     mounted() {
@@ -36,7 +50,7 @@ export default {
     <input v-model="newpseudo" type="pseudo" class="medium mx-auto mb-3 form-control" id="pseudo" placeholder="Modifier le pseudo" required >
     </div>
     <input @click.prevent="" type="submit" class="mx-auto btn btn-warning btn-send  pt-2 btn-block" value="Enregistrer le pseudo" >
-    <input type="submit" class="mx-auto btn btn-warning btn-send mt-1 pt-2 btn-block" value="Supprimer le compte" >
+    <input @click="deleteUser" type="submit" class="mx-auto btn btn-warning btn-send mt-1 pt-2 btn-block" value="Supprimer le compte" >
 
 </div>
 

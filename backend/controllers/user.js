@@ -50,3 +50,11 @@ exports.login = (req, res, next) => {
     })
     .catch((error) => res.status((500).json(error)));
 };
+
+exports.getOneUser = (req, res, next) => {
+  User.findById(req.params.id)
+    .then((user) => {
+      res.status(200).json(user);
+    })
+    .catch((error) => res.status(400).json({ error: "Utilisateur inconnu" }));
+};

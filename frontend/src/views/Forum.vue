@@ -14,6 +14,7 @@ export default {
             pseudo:"",  
             token: "",
             posts: [],
+            
             newposts: {
                 userId: "",
                 commentary: "",
@@ -26,12 +27,7 @@ export default {
         };
     },
     methods: {
-        PostLike: function (){
-            this.like++;
-        },
-        callgreen(){
-            document.getElementById('svglike').setAttribute('fill', '#ff00ff');
-        },
+
         // CREATION DU POST
         CreatePost() {
             axios.post("http://localhost:3000/api/posts", this.newposts, {
@@ -51,38 +47,37 @@ export default {
             });
         },
         
-        // POSTER LE MESSAGES
+        // POSTER LE MESSAGE
         postMsg() { 
             axios.get("http://localhost:3000/api/posts/", {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
             })  
-            .then(commentary => {
-                console.log(commentary.data);
-            this.commentary = commentary.data
+            .then(response => {
+                console.log(response.data); 
+                this.posts = response.data
+                this.posts.forEach (async (post) => {
+                    await axios.get(`http://localhost:3000/api/auth/${post.userId}`, {
+                        headers: {
+                        authorization: "Bearer " + this.token
+                        }
+                    })
+                    .then(response2 => {
+                        post.user = response2.data
+                        
+                    }) 
+                    
+                });
+                console.log(this.posts) 
             })
                 .catch(err => {
                 alert("echec de réception");
             });
         },
 
+        // CREATION DES REPONSES COMMENTAIRES
 
-        // AFFICHER LES POSTS
-        getAllPosts() {
-            fetch("http://localhost:3000/api/posts/", {
-                headers: { Authorization: "bearer " + this.token },
-            })
-                .then((response) => {
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log(data);
-                    this.posts = data;
-                });
-        },
-
-        // CREATION DU COMMENTAIRE
         Createcomment() {
             axios.post("http://localhost:3000/api/posts", this.commentposts, {
                 headers: {
@@ -101,26 +96,9 @@ export default {
             });
         },
 
-        // POSTER LE COMMENTAIRE
-        
-        // AFFICHAGE DES COMMENTAIRES
-        getAllComment() {
-            fetch("http://localhost:3000/api/posts/", {
-                headers: { Authorization: "bearer " + this.token },
-            })
-                .then((response) => {
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log(data);
-                    this.posts = data;
-                });
-        },
-            
-    
-    // MODIFIER LE POST
+        // MODIFIER LE POST
 
-    // SUPPRIMER LE POST
+        // SUPPRIMER LE POST
         deleteComment() {
             axios.delete("http://localhost:3000/api/posts", this.posts, {
                 headers: {
@@ -135,7 +113,7 @@ export default {
                     console.log({ error });
                 });
             },
-    // LIKER LE POST
+        // LIKER LE POST
         likePost() {
             axios.get('http://localhost:3000/api/post/', {
                 headers: {
@@ -147,51 +125,26 @@ export default {
                     this.like = likeDatapseudoId.data
             })
             },
-    // AFFICHER LE PSEUDO UTILISATEUR
-        pseudoGet() {
-            axios.get("http://localhost:3000/api/auth/", this.pseudo, {
-                headers: {
-                    authorization: "Bearer " + this.token
-                }
-            })
-                .then(pseudoId => {
-                    console.log(pseudoId.data);
-                    this.pseudo = pseudoId.data
-
-                })
-                .catch(err => {
-                    alert("echec de réception");
-                });
-            },
-
-
-    // DATE 
-
-
-    
     },
-
     // MONTER LES ELEMENTS SI L'UTILISATEUR EST CONNECTEE
-    mounted() {
-        const userLogin = JSON.parse(localStorage.getItem("userLogin"));
-        if (userLogin) {
-            this.newposts.userId = userLogin.userId;
-            this.token = userLogin.token;
-            this.getAllPosts();
-            this.getAllComment();
-            this.postMsg();
-        }
-        else {
-            this.$router.push("/login");
-        }
-    },
+        mounted() {
+            const userLogin = JSON.parse(localStorage.getItem("userLogin"));
+            if (userLogin) {
+                this.newposts.userId = userLogin.userId;
+                this.token = userLogin.token;
+                this.postMsg();
+            }
+            else {
+                this.$router.push("/login");
+            }
+        },
 }
 
 </script>
 
 <template>
     <LogoutNav></LogoutNav>
-    <!-- Create NEW commentary her -->
+    <!-- Create NEW POST commentary her -->
     <div class="form-wall container-sm mx-auto d-flex justify-content-center ">
         <form action="#" method="post" @submit.prevent="CreatePost">
             <textarea v-model="newposts.commentary" name="textarea" aria-label="Poster un commentaire" maxlength="300"
@@ -214,7 +167,7 @@ export default {
             <div class="card-header">
                 <div class="d-flex gap-2">
                     <div class="d-flex flex-column">
-                        <p id="name-commentary">{{ pseudo }}</p>
+                        <p  id="name-commentary" v-if="post.user" >{{ post.user.pseudo }}</p>
                     </div>
                 </div>
             </div>
@@ -223,10 +176,10 @@ export default {
             class="card-img-top" 
             alt="...">
             <div class="card-body">
-                <p class="card-text">{{ commentary }}</p>
+                <p class="card-text">{{ post.commentary }}</p>
 
                 <!-- SET TIME HER -->
-                <p class="card-text"><small class="fst-italic" > <!--{{ moment(message.createdAt).fromNow() }} --> date </small></p>
+                <p class="card-text"><small class="fst-italic" > {{ moment(post.createdAt).fromNow() }} </small></p>
                 <!-- LIKE HER -->
                 <btn class="btn" id="btn-color" v-on:click="PostLike, callgreen" > <img  id="svglike"
                         src="..\assets\logo/like-svgrepo-com.svg" alt="edit" width="40" height="30"> {{like}}</btn>

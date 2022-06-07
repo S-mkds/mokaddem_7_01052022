@@ -8,6 +8,7 @@ const path = require("path"); // creation du path serveur
 // import des routers
 const userRoutes = require("./routes/user.router");
 const postRoutes = require("./routes/post.router");
+const commentRoutes = require("./routes/comment.router");
 
 // Database
 require("./models/database.js");
@@ -35,6 +36,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/api/auth", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/comment", commentRoutes);
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 //test

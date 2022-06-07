@@ -25,13 +25,13 @@ export default {
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="form_name">Prénom *</label>
-                            <input id="form_name" type="text" name="name" class="form-control" placeholder="Entrez votre Prénom *" required="required" data-error="Firstname is required.">
+                            <input id="form_name" type="text" name="Prenom" class="form-control" placeholder="Entrez votre Prénom *" required="required" data-error="Firstname is required.">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group" id="color-label">
                             <label for="form_lastname">Nom *</label>
-                            <input id="form_lastname" type="text" name="surname" class="form-control" placeholder="Entrez votre Nom *" required="required" data-error="Lastname is required.">
+                            <input id="form_lastname" type="text" name="Nom" class="form-control" placeholder="Entrez votre Nom *" required="required" data-error="Lastname is required.">
                         </div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@ export default {
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="form_email">Email *</label>
-                            <input id="form_email" type="email" name="email" class="form-control" placeholder="Entrez votre Email *" required="required" data-error="Valid email is required.">
+                            <input id="form_email" type="email" name="Email" class="form-control" placeholder="Entrez votre Email *" required="required" data-error="Valid email is required.">
                         </div>
                     </div>
                 </div>
@@ -47,7 +47,7 @@ export default {
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="form_message">Message *</label>
-                            <textarea id="form_message" name="message" class="form-control" placeholder="Entrez votre message ici" rows="4" required="required" data-error="Please, leave us a message."></textarea>
+                            <textarea id="form_message" name="Message" class="form-control" placeholder="Entrez votre message ici" rows="4" required="required" data-error="Please, leave us a message."></textarea>
                             </div>
                         </div>
                     <div class="col-md-15">
