@@ -62,7 +62,7 @@ exports.modifyPost = (req, res, next) => {
       }
     : { ...req.body };
   Post.updateOne({ _id: req.params.id }, { ...postObject, _id: req.params.id })
-    .then(() => res.status(200).json({ message: "Post bien modifiée !" }))
+    .then(() => res.status(200).json({ message: "Message bien modifiée !" }))
     .catch((error) =>
       res.status(403).json({ error: error, message: "Requête non autorisée !" })
     );
@@ -74,7 +74,7 @@ exports.deletePost = (req, res, next) => {
       const filename = post.imageUrl.split("/images/")[1];
       fs.unlink(`images/${filename}`, () => {
         Post.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: "Post supprimée !" }))
+          .then(() => res.status(200).json({ message: "Message supprimée !" }))
           .catch((error) => res.status(400).json({ error }));
       });
     })

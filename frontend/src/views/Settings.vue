@@ -7,57 +7,70 @@ export default {
     data() {
         return {
             token: "",
-            pseudo:"",
+            pseudo: "",
+            userId: "",
         };
     },
     methods: {
-        changePseudo() {
+        // changePseudo() {
+        //     axios.put(`http://localhost:3000/api/auth/${user.userId}`, {
+        //         headers: {
+        //             authorization: "Bearer " + this.token
+        //         }
+        //     })
+        //         .then(response => {
+        //             user = response.data
+        //         })
+        //         .catch(erreur => {
+        //             alert("echec de réception");
+        //         });
+        // },
 
-        },
-
-        deleteUser() {
-            axios.delete("http://localhost:3000/api/auth/", {
-                headers: {Authorization: 'Bearer ' + this.token}})
-            .then(response => {
-                let rep = JSON.parse(response.data);
-                console.log(rep);
-                localStorage.userId = "";
-                localStorage.token = "";
-                localStorage.clear()
-                alert('vous avez été déconnecté')
-                this.$router.push("/login");  
-            })
-            .catch(error => {
-                console.log(error);
-                this.msg = error  
-            })
-        },
-        },
+        // deleteUser() {
+        //     axios.delete("http://localhost:3000/api/auth/", + this.userId, {
+        //         headers: { Authorization: 'Bearer ' + this.token }
+        //     })
+        //         .then(response => {
+        //             let rep = JSON.parse(response.data);
+        //             console.log(rep);
+        //             console.log(userId);
+        //             localStorage.clear()
+        //             alert('votre compte à été supprimer')
+        //             this.$router.push("/login");
+        //         })
+        //         .catch(error => {
+        //             console.log(error);
+        //             this.msg = error
+        //         })
+        // },
+    },
 
     mounted() {
-        
+
     },
 };
 
 </script>
 
 <template>
-<LogoutNavbar></LogoutNavbar>
-<div class="card mb-3 d-flex p-2 mt-2 mx-auto" data-v-649c4a52="">
-    <h1 class="mx-auto">Modifier le pseudo ou supprimer le compte</h1>
-    <div class="d-flex flex-column gap-1 p-1 comment " id="border-res" >
-    <p class="mx-auto font-weight-bold" id="name-response">{{ pseudo }} test</p>
-    <input v-model="newpseudo" type="pseudo" class="medium mx-auto mb-3 form-control" id="pseudo" placeholder="Modifier le pseudo" required >
-    </div>
-    <input @click.prevent="" type="submit" class="mx-auto btn btn-warning btn-send  pt-2 btn-block" value="Enregistrer le pseudo" >
-    <input @click="deleteUser" type="submit" class="mx-auto btn btn-warning btn-send mt-1 pt-2 btn-block" value="Supprimer le compte" >
+    <LogoutNavbar></LogoutNavbar>
+    <div class="card mb-3 d-flex p-2 mt-2 mx-auto" data-v-649c4a52="">
+        <h1 class="mx-auto">Modifier le pseudo ou supprimer le compte</h1>
+        <div class="d-flex flex-column gap-1 p-1 comment " id="border-res">
+            <p class="mx-auto font-weight-bold" id="name-response">Pseudo </p>
+            <input v-model="newpseudo" type="pseudo" class="medium mx-auto mb-3 form-control" id="pseudo"
+                placeholder="Modifier le pseudo" required>
+        </div>
+        <input @click.prevent="" type="submit" class="mx-auto btn btn-warning btn-send  pt-2 btn-block"
+            value="Enregistrer le pseudo">
+        <input @click="deleteUser" type="submit" class="mx-auto btn btn-warning btn-send mt-1 pt-2 btn-block"
+            value="Supprimer le compte">
 
-</div>
+    </div>
 
 </template>
 
 <style scoped>
-
 body {
     font-family: 'Lato', sans-serif;
 }
@@ -70,28 +83,31 @@ h1 {
 label {
     color: #333;
 }
-#bg-contact{
+
+#bg-contact {
     background-color: #4E5166;
 }
 
 .medium {
-     width: 50% !important;
+    width: 50% !important;
 }
+
 .btn-send {
     font-weight: 300;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     width: 80%;
     margin-left: 3px;
-    }
+}
+
 .help-block.with-errors {
     color: #ff5050;
     margin-top: 5px;
 
 }
 
-.card{
-	margin-left: 10px;
-	margin-right: 10px;
+.card {
+    margin-left: 10px;
+    margin-right: 10px;
 }
 </style>

@@ -3,6 +3,7 @@ const fs = require("fs");
 
 exports.createComment = (req, res, next) => {
   const commentObject = req.body;
+  let userId = req.body.userId;
   delete commentObject._id;
   const comment = new Comment({
     ...commentObject,
@@ -11,7 +12,7 @@ exports.createComment = (req, res, next) => {
     .save()
     .then(() => {
       res.status(201).json({
-        message: "Message bien enregistrée !",
+        message: "Commentaire bien enregistrée !",
       });
     })
     .catch((error) => {

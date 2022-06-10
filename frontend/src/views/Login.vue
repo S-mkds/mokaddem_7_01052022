@@ -61,7 +61,7 @@ export default{
           localStorage.clear();
           if (err.response.status === 401) {
             this.error =
-              "Connexion au serveur impossible.";
+              "Connexion au serveur impossible, vérifiez vos identifiants";
           } else {
             this.error = "Vérifiez vos identifiants. ";
           }
