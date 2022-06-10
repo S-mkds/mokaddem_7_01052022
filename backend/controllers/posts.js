@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
 const fs = require("fs");
+const comment = require("../models/comment");
 
 exports.createPost = (req, res, next) => {
   const postObject = req.body;
@@ -69,16 +70,16 @@ exports.modifyPost = (req, res, next) => {
 };
 
 exports.deletePost = (req, res, next) => {
-  Post.findOne({ _id: req.params.id })
-    .then((post) => {
-      const filename = post.imageUrl.split("/images/")[1];
-      fs.unlink(`images/${filename}`, () => {
-        Post.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: "Message supprimée !" }))
-          .catch((error) => res.status(400).json({ error }));
-      });
-    })
-    .catch((error) => res.status(500).json({ error }));
+  Post.deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: "Message supprimée !" }))
+    .catch((error) => res.status(400).json({ error }));
+};
+
+exports.getPostComments = (req, res, next) => {
+  comment
+    .find({ postId: req.params.id })
+    .then((comments) => res.status(200).json(comments))
+    .catch((erreur) => res.status(500).json(erreur));
 };
 
 exports.likePost = (req, res, next) => {

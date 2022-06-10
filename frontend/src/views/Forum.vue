@@ -13,7 +13,6 @@ export default {
             likes: [],
             pseudo: "",
             token: "",
-            _id: "",
             posts: [],
             comments: [],
             showedit: false,
@@ -23,10 +22,10 @@ export default {
                 commentary: "",
                 imageUrl: "" || null,
             },
-
             commentposts: {
                 userId: "",
                 commentary: "",
+                postId: "",
             },
         };
     },
@@ -43,7 +42,7 @@ export default {
                     // console.log(response.data);
                     if (!response.data.error) {
                         alert(response.data.message);
-                        location.reload();
+                        this.postMsg();
                     }
                 })
                 .catch(err => {
@@ -70,6 +69,14 @@ export default {
                             .then(response2 => {
                                 post.user = response2.data;
                             })
+                        await axios.get(`http://localhost:3000/api/posts/${post._id}/comments`, {
+                            headers: {
+                                authorization: "Bearer " + this.token
+                            }
+                        })
+                            .then(response3 => {
+                                post.comments = response3.data
+                            })
                     });
                     // console.log(this.posts) 
                 })
@@ -79,17 +86,19 @@ export default {
         },
 
         // CREATION DES REPONSES COMMENTAIRES
-        createComment() {
+        createComment(post) {
+            this.commentposts.postId = post._id;
             axios.post("http://localhost:3000/api/comment", this.commentposts, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
             })
                 .then(response => {
+
                     console.log(response.data);
                     if (!response.data.error) {
                         alert(response.data.message);
-                        location.reload();
+                        this.postMsg();
                     }
                 })
                 .catch(err => {
@@ -97,34 +106,6 @@ export default {
                 });
         },
 
-        // POSTER LE COMMENTAIRE
-        postCommentary() {
-            axios.get("http://localhost:3000/api/comment", {
-                headers: {
-                    authorization: "Bearer " + this.token
-                }
-            })
-                .then(response => {
-                    console.log(response.data);
-                    this.comments = response.data
-                    this.comments.forEach(async (comment) => {
-                        await axios.get(`http://localhost:3000/api/auth/${comment.userId}`, {
-                            headers: {
-                                authorization: "Bearer " + this.token
-                            }
-                        })
-                            .then(response2 => {
-                                comment.user = response2.data
-
-                            })
-
-                    });
-                    console.log(this.comments)
-                })
-                .catch(erreur => {
-                    alert("echec de réception");
-                });
-        },
 
         // MODIFIER LE POST
         showedit() {
@@ -132,15 +113,16 @@ export default {
         },
 
         // SUPPRIMER LE POST
-        deleteComment() {
-            axios.delete("http://localhost:3000/api/posts/", + this._id, {
+
+        deleteComment(post) {
+            axios.delete(`http://localhost:3000/api/posts/${post._id}`, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
             })
                 .then(() => {
+                    this.postMsg();
                     alert("Votre commentaire a bien été supprimé !");
-                    document.location.reload();
                 })
                 .catch((error) => {
                     console.log({ error });
@@ -148,22 +130,22 @@ export default {
         },
 
         // LIKER LE POST
-        liked() {
-            axios
-                .post("http://localhost:3000/api/", {
-                    userId: this.userId,
-                })
-                .then(function (response) {
-                    const ObjlikedPosts = response.data;
-                    this.like = [];
-                    for (const ObjlikedPost of ObjlikedPosts) {
-                        this.like.push(ObjlikedPost.userId);
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
+        // liked() {
+        //     axios
+        //         .post("http://localhost:3000/api/", {
+        //             userId: this.userId,
+        //         })
+        //         .then(function (response) {
+        //             const ObjlikedPosts = response.data;
+        //             this.like = [];
+        //             for (const ObjlikedPost of ObjlikedPosts) {
+        //                 this.like.push(ObjlikedPost.userId);
+        //             }
+        //         })
+        //         .catch(function (error) {
+        //             console.log(error);
+        //         });
+        // },
     },
     // MONTER LES ELEMENTS SI L'UTILISATEUR EST CONNECTEE
     mounted() {
@@ -173,9 +155,6 @@ export default {
             this.commentposts.userId = userLogin.userId;
             this.token = userLogin.token;
             this.postMsg();
-            this.deleteComment();
-            this.postCommentary();
-            this.liked();
         }
         else {
             this.$router.push("/login");
@@ -237,29 +216,29 @@ export default {
                 <p class="card-text border-date"><small class="fst-italic"> {{ moment(post.createdAt).fromNow() }}
                     </small></p>
                 <!-- LIKE HER -->
-                <btn class="btn" id="btn-color"> <img id="svglike" src="..\assets\logo/like-svgrepo-com.svg" alt="edit"
-                        width="40" height="30"> </btn>
+                <button class="btn" id="btn-color"> <img id="svglike" src="..\assets\logo/like-svgrepo-com.svg"
+                        alt="edit" width="40" height="30"> </button>
                 <!-- MODIFY HER -->
-                <btn class="btn" id="btn-color" @click="showedit"> <img src="..\assets\logo/edit-svgrepo-com.svg"
-                        alt="edit" width="40" height="30"> </btn>
+                <button class="btn" id="btn-color" @click="showedit"> <img src="..\assets\logo/edit-svgrepo-com.svg"
+                        alt="edit" width="40" height="30"> </button>
 
                 <!-- DELETE HER -->
-                <btn class="btn" id="btn-color" type="submit" @click.prevent="deleteComment"> <img
-                        src="..\assets\logo/delete-svgrepo-com.svg" alt="delete" width="40" height="30"> </btn>
+                <button class="btn" id="btn-color" type="submit" @click="deleteComment(post)"> <img
+                        src="..\assets\logo/delete-svgrepo-com.svg" alt="delete" width="40" height="30"> </button>
             </div>
 
 
             <!--  RESPONSE COMMENT HER  -->
-            <div class="d-flex gap-2 p-1 fs- text mt-2 " id="border-res" :comment="comment" v-for="comment in comments"
-                v-bind:value="posts">
+            <div class="d-flex gap-2 p-1 fs- text mt-2 " id="border-res" :comment="comment"
+                v-for="comment in post.comments" v-bind:value="posts">
                 <div class="d-flex flex-column gap-1 p-1 comment " id="border-res">
                     <p class="font-weight-bold pseudo-user p-2" id="name-response" v-if="comment.user">{{
-                            comment.user.pseudo
+                            post.user.pseudo
                     }}</p>
                     <p class="p-1">{{ comment.commentary }} </p>
                 </div>
             </div>
-            <form action="#" method="post" @submit.prevent="createComment">
+            <form action="#" method="post" @submit.prevent="createComment(post)">
                 <div class="d-flex p-1 gap-2 mt-3">
                     <textarea v-model="commentposts.commentary" name="textarea" aria-label="Poster une réponse"
                         maxlength="150" rows="2" cols="90" id="floatingTextarea" placeholder="Votre Réponse"
