@@ -82,6 +82,13 @@ exports.getPostComments = (req, res, next) => {
     .catch((erreur) => res.status(500).json(erreur));
 };
 
+exports.getPseudo = (req, res, next) => {
+  user
+    .find({ pseudo: req.params.id })
+    .then((user) => res.status(200).json(user))
+    .catch((erreur) => res.status(500).json(erreur));
+};
+
 exports.likePost = (req, res, next) => {
   let like = req.body.like;
   let userId = req.body.userId;

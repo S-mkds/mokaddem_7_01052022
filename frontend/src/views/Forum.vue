@@ -29,6 +29,7 @@ export default {
             },
         };
     },
+
     methods: {
 
         // CREATION DU POST
@@ -42,7 +43,7 @@ export default {
                     // console.log(response.data);
                     if (!response.data.error) {
                         alert(response.data.message);
-                        this.postMsg();
+                        this.getPosts();
                     }
                 })
                 .catch(err => {
@@ -50,8 +51,8 @@ export default {
                 });
         },
 
-        // POSTER LE MESSAGE
-        postMsg() {
+        // Récuperer les MESSAGES
+        getPosts() {
             axios.get("http://localhost:3000/api/posts/", {
                 headers: {
                     authorization: "Bearer " + this.token
@@ -77,8 +78,17 @@ export default {
                             .then(response3 => {
                                 post.comments = response3.data
                             })
+                        //  RECUPERER LE PSEUDO DANS LE COMMENTAIRE
+                        // await axios.get(`http://localhost:3000/api/auth/${post.useriD}`, {
+                        //     headers: {
+                        //         authorization: "Bearer " + this.token
+                        //     }
+                        // })
+                        //     .then(response4 => {
+                        //         post.user = response4.data
+                        //         console.log(response.data);
+                        //     })
                     });
-                    // console.log(this.posts) 
                 })
                 .catch(err => {
                     alert("echec de réception");
@@ -98,7 +108,7 @@ export default {
                     console.log(response.data);
                     if (!response.data.error) {
                         alert(response.data.message);
-                        this.postMsg();
+                        this.getPosts();
                     }
                 })
                 .catch(err => {
@@ -108,8 +118,19 @@ export default {
 
 
         // MODIFIER LE POST
-        showedit() {
-            this.showedit = true;
+        editComment(post) {
+            axios.put(`http://localhost:3000/api/posts/${post._id}`, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+                .then(() => {
+                    this.getPosts();
+                    alert("Votre commentaire a bien été supprimé !");
+                })
+                .catch((error) => {
+                    console.log({ error });
+                });
         },
 
         // SUPPRIMER LE POST
@@ -121,7 +142,7 @@ export default {
                 }
             })
                 .then(() => {
-                    this.postMsg();
+                    this.getPosts();
                     alert("Votre commentaire a bien été supprimé !");
                 })
                 .catch((error) => {
@@ -130,31 +151,33 @@ export default {
         },
 
         // LIKER LE POST
-        // liked() {
-        //     axios
-        //         .post("http://localhost:3000/api/", {
-        //             userId: this.userId,
-        //         })
-        //         .then(function (response) {
-        //             const ObjlikedPosts = response.data;
-        //             this.like = [];
-        //             for (const ObjlikedPost of ObjlikedPosts) {
-        //                 this.like.push(ObjlikedPost.userId);
-        //             }
-        //         })
-        //         .catch(function (error) {
-        //             console.log(error);
-        //         });
-        // },
+        liked() {
+            axios
+                .post(`http://localhost:3000/api/posts/${post._id}`, {
+                    userId: this.userId,
+                })
+                .then(function (response) {
+                    const ObjlikedPosts = response.data;
+                    this.like = [];
+                    for (const ObjlikedPost of ObjlikedPosts) {
+                        this.like.push(ObjlikedPost.this.userId);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
     },
+
     // MONTER LES ELEMENTS SI L'UTILISATEUR EST CONNECTEE
+
     mounted() {
         const userLogin = JSON.parse(localStorage.getItem("userLogin"));
         if (userLogin) {
             this.newposts.userId = userLogin.userId;
             this.commentposts.userId = userLogin.userId;
             this.token = userLogin.token;
-            this.postMsg();
+            this.getPosts();
         }
         else {
             this.$router.push("/login");
@@ -167,24 +190,27 @@ export default {
 <template>
     <LogoutNav></LogoutNav>
     <!-- Create NEW POST commentary her -->
-    <div class="form-wall container-sm mx-auto d-flex justify-content-center ">
-        <form action="#" method="post" @submit.prevent="createPost">
-            <textarea v-model="newposts.commentary" name="textarea" aria-label="Poster un commentaire" maxlength="300"
-                rows="2" cols="80" id="floatingTextarea" placeholder="Votre commentaire"></textarea>
-            <br />
-            <input class="btn btn-primary" aria-label="Post d'un commentaire" type="submit" name="submitInfo"
-                value="Publier le commentaire" />
-            <div class="form-group">
-                <input type="file" class="form-control-file " aria-label="Publication une image"
-                    id="exampleFormControlFile1" />
-            </div>
-            <hr class="dropdown-divider" />
-        </form>
+    <div class=" align-card form-wall d-flex mt-2">
+        <div class="card mb-3 d-flex p-2 ">
+            <form action="#" method="post" @submit.prevent="createPost">
+                <textarea v-model="newposts.commentary" name="textarea" aria-label="Poster votre commentaire"
+                    maxlength="150" rows="2" cols="60" placeholder="Publier un nouveau commentaire"
+                    data-v-133ed8df=""></textarea>
+                <br />
+                <input class="  btn btn-primary" aria-label="Post d'un commentaire" type="submit" name="submitInfo"
+                    value="Publier le commentaire" />
+                <div class="form-group">
+                    <input type="file" accept="image/png, image/jpeg" class="form-control-file "
+                        aria-label="Publication une image" id="exampleFormControlFile1" />
+                </div>
+                <hr class="dropdown-divider" />
+            </form>
+        </div>
     </div>
 
     <!--  POST HER  -->
 
-    <div class="align-card form-wall" :post="post" v-for="post in posts" v-bind:value="posts">
+    <div class="align-card form-wall m-1" :post="post" v-for="post in posts" v-bind:value="posts">
         <div class="card mb-3 d-flex p-2 ">
             <div class="card-header">
                 <div class="d-flex gap-2">
@@ -200,16 +226,16 @@ export default {
 
                 <!-- EDIT COMMENT HER -->
 
-                <!-- <form>
+                <form v-if="showedit">
                     <div class="d-flex p-1 gap-2 mt-1 mb-3">
                         <textarea name="textarea" aria-label="Poster une réponse" maxlength="150" rows="2" cols="90"
                             placeholder="Modifier votre message" data-v-133ed8df=""></textarea>
                         <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Modifier"
                             aria-label="submit post">
-                        <input class="btn btn-secondary ms-auto" type="button" name="backedit" value="Annuler"
-                            aria-label="showeditfalse">
+                        <input v-on:click="showedit = false" class="btn btn-secondary ms-auto" type="button"
+                            name="backedit" value="Annuler" aria-label="showeditfalse">
                     </div>
-                </form> -->
+                </form>
 
 
                 <!-- SET TIME HER -->
@@ -219,8 +245,8 @@ export default {
                 <button class="btn" id="btn-color"> <img id="svglike" src="..\assets\logo/like-svgrepo-com.svg"
                         alt="edit" width="40" height="30"> </button>
                 <!-- MODIFY HER -->
-                <button class="btn" id="btn-color" @click="showedit"> <img src="..\assets\logo/edit-svgrepo-com.svg"
-                        alt="edit" width="40" height="30"> </button>
+                <button class="btn" id="btn-color" @click.prevent="showedit = true, editComment(post)"> <img
+                        src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40" height="30"> </button>
 
                 <!-- DELETE HER -->
                 <button class="btn" id="btn-color" type="submit" @click="deleteComment(post)"> <img
@@ -233,7 +259,7 @@ export default {
                 v-for="comment in post.comments" v-bind:value="posts">
                 <div class="d-flex flex-column gap-1 p-1 comment " id="border-res">
                     <p class="font-weight-bold pseudo-user p-2" id="name-response" v-if="comment.user">{{
-                            post.user.pseudo
+                            comment.user.pseudo
                     }}</p>
                     <p class="p-1">{{ comment.commentary }} </p>
                 </div>
@@ -268,6 +294,8 @@ export default {
 .pseudo-user {
     border-bottom: 1px solid rgba(0, 0, 0, 0.267);
 }
+
+
 
 #btn-color {
     color: white !important;
@@ -322,7 +350,6 @@ export default {
 }
 
 .card {
-    width: 60rem;
     background-color: #4E5166 !important;
 }
 
@@ -333,5 +360,9 @@ export default {
 
 .d-flex p:nth-child(1) {
     font-weight: bold;
+}
+
+#btn-primary {
+    color: blue !important;
 }
 </style>
