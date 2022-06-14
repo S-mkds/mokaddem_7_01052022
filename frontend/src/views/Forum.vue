@@ -2,6 +2,8 @@
 import axios from 'axios';
 import LogoutNav from '../components/layout/LogoutNav.vue';
 import moment from "moment";
+
+
 export default {
     name: "Comment",
     components: { LogoutNav },
@@ -79,15 +81,17 @@ export default {
                                 post.comments = response3.data
                             })
                         //  RECUPERER LE PSEUDO DANS LE COMMENTAIRE
-                        // await axios.get(`http://localhost:3000/api/auth/${post.useriD}`, {
+                        // await axios.get(`http://localhost:3000/api/auth/${.useriD}`, {
                         //     headers: {
                         //         authorization: "Bearer " + this.token
                         //     }
                         // })
                         //     .then(response4 => {
-                        //         post.user = response4.data
+                        //         userId.user = response4.data
                         //         console.log(response.data);
                         //     })
+
+
                     });
                 })
                 .catch(err => {
@@ -117,24 +121,7 @@ export default {
         },
 
 
-        // MODIFIER LE POST
-        editComment(post) {
-            axios.put(`http://localhost:3000/api/posts/${post._id}`, {
-                headers: {
-                    authorization: "Bearer " + this.token
-                }
-            })
-                .then(() => {
-                    this.getPosts();
-                    alert("Votre commentaire a bien été supprimé !");
-                })
-                .catch((error) => {
-                    console.log({ error });
-                });
-        },
-
         // SUPPRIMER LE POST
-
         deleteComment(post) {
             axios.delete(`http://localhost:3000/api/posts/${post._id}`, {
                 headers: {
@@ -150,23 +137,35 @@ export default {
                 });
         },
 
-        // LIKER LE POST
-        liked() {
-            axios
-                .post(`http://localhost:3000/api/posts/${post._id}`, {
-                    userId: this.userId,
+        // MODIFIER LE POST
+        editComment(post) {
+            axios.put(`http://localhost:3000/api/posts/${post._id}`, post, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+                .then(() => {
+                    this.getPosts();
                 })
-                .then(function (response) {
-                    const ObjlikedPosts = response.data;
-                    this.like = [];
-                    for (const ObjlikedPost of ObjlikedPosts) {
-                        this.like.push(ObjlikedPost.this.userId);
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
+                .catch((error) => {
+                    console.log({ error });
                 });
         },
+
+        // LIKER LE POST
+        // liked(post) {
+        //     axios.post(`http://localhost:3000/api/posts/${post._id}/like`, this.likes, {
+        //         headers: {
+        //             authorization: "Bearer " + this.token
+        //         }
+        //     })
+        //         .then(() => {
+
+        //         })
+        //         .catch(err => {
+        //             alert("echec de réception");
+        //         });
+        // },
     },
 
     // MONTER LES ELEMENTS SI L'UTILISATEUR EST CONNECTEE
@@ -210,7 +209,7 @@ export default {
 
     <!--  POST HER  -->
 
-    <div class="align-card form-wall m-1" :post="post" v-for="post in posts" v-bind:value="posts">
+    <div class="align-card form-wall m-1" :post="post" v-for="post in posts.slice().reverse()" v-bind:value="posts">
         <div class="card mb-3 d-flex p-2 ">
             <div class="card-header">
                 <div class="d-flex gap-2">
@@ -235,15 +234,19 @@ export default {
                         <input v-on:click="showedit = false" class="btn btn-secondary ms-auto" type="button"
                             name="backedit" value="Annuler" aria-label="showeditfalse">
                     </div>
+                    <input type="file" accept="image/png, image/jpeg" class="form-control-file mb-3"
+                        aria-label="Publication une image" />
                 </form>
 
 
                 <!-- SET TIME HER -->
                 <p class="card-text border-date"><small class="fst-italic"> {{ moment(post.createdAt).fromNow() }}
                     </small></p>
+
                 <!-- LIKE HER -->
                 <button class="btn" id="btn-color"> <img id="svglike" src="..\assets\logo/like-svgrepo-com.svg"
-                        alt="edit" width="40" height="30"> </button>
+                        alt="edit" width="40" height="30"> 0 </button>
+
                 <!-- MODIFY HER -->
                 <button class="btn" id="btn-color" @click.prevent="showedit = true, editComment(post)"> <img
                         src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40" height="30"> </button>
@@ -259,7 +262,7 @@ export default {
                 v-for="comment in post.comments" v-bind:value="posts">
                 <div class="d-flex flex-column gap-1 p-1 comment " id="border-res">
                     <p class="font-weight-bold pseudo-user p-2" id="name-response" v-if="comment.user">{{
-                            comment.user.pseudo
+                            post.comment.user.pseudo
                     }}</p>
                     <p class="p-1">{{ comment.commentary }} </p>
                 </div>
