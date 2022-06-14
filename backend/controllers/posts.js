@@ -3,11 +3,17 @@ const fs = require("fs");
 const comment = require("../models/comment");
 
 exports.createPost = (req, res, next) => {
-  const postObject = req.body;
+  const postObject = JSON.parse(req.body.post);
+  let imageUrl = null;
+  if (req.file) {
+    imageUrl = `${req.protocol}://${req.get("host")}/images/${
+      req.file.filename
+    }`;
+  }
   delete postObject._id;
   const post = new Post({
     ...postObject,
-    imageUrl: null, // `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
+    imageUrl: imageUrl,
     likes: 0,
     dislikes: 0,
     usersLiked: [" "],

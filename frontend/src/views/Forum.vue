@@ -9,7 +9,6 @@ export default {
     components: { LogoutNav },
     data() {
         return {
-
             moment: moment,
             createAt: "",
             likes: [],
@@ -18,11 +17,10 @@ export default {
             posts: [],
             comments: [],
             showedit: false,
-
+            editpost: "",
             newposts: {
                 userId: "",
                 commentary: "",
-                imageUrl: "" || null,
             },
             commentposts: {
                 userId: "",
@@ -36,7 +34,10 @@ export default {
 
         // CREATION DU POST
         createPost() {
-            axios.post("http://localhost:3000/api/posts", this.newposts, {
+            const data = new FormData();
+            data.append("post", JSON.stringify(this.newposts));
+            data.append("image", document.getElementById("postImage").files[0]);
+            axios.post("http://localhost:3000/api/posts", data, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
@@ -79,19 +80,17 @@ export default {
                         })
                             .then(response3 => {
                                 post.comments = response3.data
+                                post.comments.forEach(async (comment) => {
+                                    await axios.get(`http://localhost:3000/api/auth/${comment.userId}`, {
+                                        headers: {
+                                            authorization: "Bearer " + this.token
+                                        }
+                                    })
+                                        .then(response4 => {
+                                            comment.user = response4.data;
+                                        })
+                                })
                             })
-                        //  RECUPERER LE PSEUDO DANS LE COMMENTAIRE
-                        // await axios.get(`http://localhost:3000/api/auth/${.useriD}`, {
-                        //     headers: {
-                        //         authorization: "Bearer " + this.token
-                        //     }
-                        // })
-                        //     .then(response4 => {
-                        //         userId.user = response4.data
-                        //         console.log(response.data);
-                        //     })
-
-
                     });
                 })
                 .catch(err => {
@@ -138,7 +137,8 @@ export default {
         },
 
         // MODIFIER LE POST
-        editComment(post) {
+        editPost(post) {
+            post.commentary = this.editpost;
             axios.put(`http://localhost:3000/api/posts/${post._id}`, post, {
                 headers: {
                     authorization: "Bearer " + this.token
@@ -200,7 +200,7 @@ export default {
                     value="Publier le commentaire" />
                 <div class="form-group">
                     <input type="file" accept="image/png, image/jpeg" class="form-control-file "
-                        aria-label="Publication une image" id="exampleFormControlFile1" />
+                        aria-label="Publication une image" id="postImage" />
                 </div>
                 <hr class="dropdown-divider" />
             </form>
@@ -218,17 +218,16 @@ export default {
                     </div>
                 </div>
             </div>
-            <img v-if="newposts.imageUrl != null" :src="require(`../../../backend/images/${ImageUrl}`)"
-                class="card-img-top" alt="...">
+            <img v-if="post.imageUrl" :src="post.imageUrl" class="card-img-top" alt="...">
             <div class="card-body">
-                <p class="card-text none-bold">{{ post.commentary }}</p>
+                <p class="card-text none-bold" v-if="!showedit">{{ post.commentary }}</p>
 
                 <!-- EDIT COMMENT HER -->
 
-                <form v-if="showedit">
+                <form v-if="showedit" @submit.prevent="editPost(post)">
                     <div class="d-flex p-1 gap-2 mt-1 mb-3">
-                        <textarea name="textarea" aria-label="Poster une réponse" maxlength="150" rows="2" cols="90"
-                            placeholder="Modifier votre message" data-v-133ed8df=""></textarea>
+                        <textarea v-model="editpost" name="textarea" aria-label="Poster une réponse" maxlength="150"
+                            rows="2" cols="90" placeholder="Modifier votre message" data-v-133ed8df=""></textarea>
                         <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Modifier"
                             aria-label="submit post">
                         <input v-on:click="showedit = false" class="btn btn-secondary ms-auto" type="button"
@@ -248,7 +247,7 @@ export default {
                         alt="edit" width="40" height="30"> 0 </button>
 
                 <!-- MODIFY HER -->
-                <button class="btn" id="btn-color" @click.prevent="showedit = true, editComment(post)"> <img
+                <button class="btn" id="btn-color" @click.prevent="showedit = true, editpost = post.commentary"> <img
                         src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40" height="30"> </button>
 
                 <!-- DELETE HER -->
@@ -262,7 +261,7 @@ export default {
                 v-for="comment in post.comments" v-bind:value="posts">
                 <div class="d-flex flex-column gap-1 p-1 comment " id="border-res">
                     <p class="font-weight-bold pseudo-user p-2" id="name-response" v-if="comment.user">{{
-                            post.comment.user.pseudo
+                            comment.user.pseudo
                     }}</p>
                     <p class="p-1">{{ comment.commentary }} </p>
                 </div>
