@@ -15,9 +15,7 @@ exports.createPost = (req, res, next) => {
     ...postObject,
     imageUrl: imageUrl,
     likes: 0,
-    dislikes: 0,
     usersLiked: [" "],
-    usersdisLiked: [" "],
   });
   post
     .save()
@@ -132,17 +130,6 @@ exports.likePost = (req, res, next) => {
           }
         })
         .catch((error) => res.status(404).json({ error }));
-      break;
-
-    case -1:
-      Post.updateOne(
-        { _id: postId },
-        { $push: { usersDisliked: userId }, $inc: { dislikes: +1 } }
-      )
-        .then(() => {
-          res.status(200).json({ message: "Dislike" });
-        })
-        .catch((error) => res.status(400).json({ error }));
       break;
 
     default:

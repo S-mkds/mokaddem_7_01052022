@@ -1,30 +1,34 @@
 <template>
-<NavbarVue></NavbarVue>
-<main class="form-signin">
-  <form @submit.prevent="login">
-    <img class="img-log d-block mx-auto" src="..\assets\logo\icon-left-font-monochrome-black.png" alt="" width="180" height="180">
-    
-    <div class="form-floating">
-      <input v-model="email" type="email-adress" class="form-control" id="email-adress" placeholder="name@example.com" @keyup.enter="login" required>
-      <label for="email-adress">Email</label>
-    </div>
-    
-    <div class="form-floating">
-      <input v-model="password" type="password" class="form-control" id="password" placeholder="Password" @keyup.enter="login" required>
-      <label for="password">Mot de passe</label>
-    </div>
+  <NavbarVue></NavbarVue>
+  <main class="form-signin">
+    <form @submit.prevent="login">
+      <img class="img-log d-block mx-auto" src="..\assets\logo\icon-left-font-monochrome-black.png" alt="" width="180"
+        height="180">
 
-    <div class="checkbox mb-3">
-    </div>
-    <button class="w-100 btn btn-lg btn-warning" type="submit">Connexion</button>
-    <p class="my-3 text-danger">{{ error }}</p>
-        <div class="text-center font-weight-bold">
-            Crée un compte <routerLink to="/SignUp"> <a href="#" class="font-weight-bold color-a" id="signUp">signup</a></routerLink>
-        </div>
+      <div class="form-floating">
+        <input v-model="email" type="email-adress" class="form-control" id="email-adress" placeholder="name@example.com"
+          @keyup.enter="login" required>
+        <label for="email-adress">Email</label>
+      </div>
 
-    <p class="mt-2 mb-3 text-muted text-center color-text" id="text-copy">&copy; Groupomania 2022</p>
-  </form>
-</main>
+      <div class="form-floating">
+        <input v-model="password" type="password" class="form-control" id="password" placeholder="Password"
+          @keyup.enter="login" required>
+        <label for="password">Mot de passe</label>
+      </div>
+
+      <div class="checkbox mb-3">
+      </div>
+      <button class="w-100 btn btn-lg btn-warning" type="submit">Connexion</button>
+      <p class="my-3 text-danger">{{ error }}</p>
+      <div class="text-center font-weight-bold">
+        Crée un compte <routerLink to="/SignUp"> <a href="#" class="font-weight-bold color-a" id="signUp">signup</a>
+        </routerLink>
+      </div>
+
+      <p class="mt-2 mb-3 text-muted text-center color-text" id="text-copy">&copy; Groupomania 2022</p>
+    </form>
+  </main>
 
 </template>
 
@@ -32,9 +36,9 @@
 import NavbarVue from '../components/layout/Navbar.vue';
 import Axios from "axios";
 
-export default{
-    name: 'Login',
-    components: { NavbarVue },
+export default {
+  name: 'Login',
+  components: { NavbarVue },
 
   data() {
     return {
@@ -73,16 +77,19 @@ export default{
 </script>
 
 <style scoped>
-.color-a { 
-   color: var(--bs-body-color) !important;
-   font-weight: bold;
+.color-a {
+  color: var(--bs-body-color) !important;
+  font-weight: bold;
 }
-.color-text { 
-   color: #000000 !important;
+
+.color-text {
+  color: #000000 !important;
 }
+
 .img-log {
- margin-bottom: -4rem;
+  margin-bottom: -4rem;
 }
+
 .form-signin {
   width: 100%;
   max-width: 330px;
@@ -112,16 +119,16 @@ export default{
 
 
 .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
+  font-size: 1.125rem;
+  text-anchor: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
 
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-      </style>
+@media (min-width: 768px) {
+  .bd-placeholder-img-lg {
+    font-size: 3.5rem;
+  }
+}
+</style>

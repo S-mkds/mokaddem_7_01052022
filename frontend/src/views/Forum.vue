@@ -12,6 +12,7 @@ export default {
             moment: moment,
             createAt: "",
             likes: [],
+            btnLike: false,
             pseudo: "",
             token: "",
             posts: [],
@@ -127,10 +128,17 @@ export default {
                     authorization: "Bearer " + this.token
                 }
             })
+
                 .then(() => {
-                    this.getPosts();
-                    alert("Votre commentaire a bien été supprimé !");
-                })
+                    if (post = this.token) {
+                        this.getPosts();
+                        alert("Votre commentaire a bien été supprimé !");
+                    }
+                    else {
+                        alert("Vous n'êtes pas l'auteur de ce post")
+                    }
+                }
+                )
                 .catch((error) => {
                     console.log({ error });
                 });
@@ -154,35 +162,39 @@ export default {
         },
 
         // LIKER LE POST
-        // liked(post) {
-        //     axios.post(`http://localhost:3000/api/posts/${post._id}/like`, this.likes, {
-        //         headers: {
-        //             authorization: "Bearer " + this.token
-        //         }
-        //     })
-        //         .then(() => {
+        liked(post) {
+            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, this.likes, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+                .then(() => {
 
-        //         })
-        //         .catch(err => {
-        //             alert("echec de réception");
-        //         });
-        // },
+                })
+                .catch(err => {
+                    alert("echec de réception");
+                });
+        },
+
     },
 
     // MONTER LES ELEMENTS SI L'UTILISATEUR EST CONNECTEE
-
     mounted() {
         const userLogin = JSON.parse(localStorage.getItem("userLogin"));
         if (userLogin) {
             this.newposts.userId = userLogin.userId;
             this.commentposts.userId = userLogin.userId;
             this.token = userLogin.token;
+            this.userId = userLogin.userId
             this.getPosts();
         }
         else {
             this.$router.push("/login");
         }
     },
+    created() {
+        moment.locale('fr')
+    }
 }
 
 </script>
@@ -214,7 +226,7 @@ export default {
         v-bind:value="posts">
         <div class="card mb-3 d-flex p-2 ">
             <div class="card-header">
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-1">
                     <div class="d-flex flex-column ">
                         <p id="name-commentary" v-if="post.user">{{ post.user.pseudo }}</p>
                     </div>
@@ -227,6 +239,7 @@ export default {
                     <img v-if="post.imageUrl" :src="post.imageUrl" class="card-img-top image-size" max-width="50%"
                         alt="post.imageUrl">
                 </div>
+
                 <!-- EDIT COMMENT HER -->
 
                 <form v-if="showedit" @submit.prevent="editPost(post)">
@@ -240,32 +253,46 @@ export default {
                             name="backedit" value="Fermer" aria-label="showeditfalse">
                     </div>
                     <input type="file" accept="image/png, image/jpeg" class="form-control-file mb-3"
-                        aria-label="Publication une image" />
+                        aria-label="Publication une image" id="postImage" />
                 </form>
 
 
                 <!-- SET TIME HER -->
-                <p class="card-text border-date"><small class="fst-italic"> {{ moment(post.createdAt).fromNow() }}
+                <p class="d-flex justify-content-end card-text border-date"><small class="fst-italic"> {{
+                        moment(post.createdAt).fromNow()
+                }}
                     </small></p>
-
                 <!-- LIKE HER -->
-                <button class="btn" id="btn-color"> <img id="svglike" src="..\assets\logo/like-svgrepo-com.svg"
-                        alt="edit" width="40" height="30"> 0 </button>
+                <div class="d-flex justify-content-evenly">
+                    <div>
+                        <button class="btn" v-if="!btnLike" v-on:click="btnLike = true" id="btn-color"> <img
+                                id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30"> 0
+                        </button>
 
-                <!-- MODIFY HER -->
-                <button class="btn" id="btn-color" @click.prevent="showedit = true, editpost = post.commentary"> <img
-                        src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40" height="30"> </button>
+                        <button class="btn liked-transtion" v-if="btnLike" v-on:click="btnLike = false" id="btn-color">
+                            <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30"> 1
+                        </button>
+                    </div>
+                    <!-- MODIFY HER -->
+                    <div>
+                        <button class="btn" id="btn-color" @click.prevent="showedit = true, editpost = post.commentary">
+                            <img src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40" height="30"> </button>
+                    </div>
+                    <!-- DELETE HER -->
+                    <div>
+                        <button class="btn " id="btn-color" type="submit" @click="deleteComment(post)">
+                            <img src="..\assets\logo/delete-svgrepo-com.svg" alt="delete" width="40" height="30">
+                        </button>
+                    </div>
 
-                <!-- DELETE HER -->
-                <button class="btn" id="btn-color" type="submit" @click="deleteComment(post)"> <img
-                        src="..\assets\logo/delete-svgrepo-com.svg" alt="delete" width="40" height="30"> </button>
+                </div>
             </div>
 
 
             <!--  RESPONSE COMMENT HER  -->
-            <div class="d-flex gap-2 p-1 fs- text mt-2 " id="border-res" :comment="comment"
+            <div class="d-flex gap-2 p-1 fs- text mb-2" id="border-res" :comment="comment"
                 v-for="comment in post.comments" v-bind:value="posts">
-                <div class="d-flex flex-column gap-1 p-1 comment " id="border-res">
+                <div class="d-flex flex-column gap-1 p-1 comment  " id="border-res">
                     <p class="font-weight-bold pseudo-user p-2" id="name-response" v-if="comment.user">{{
                             comment.user.pseudo
                     }}</p>
@@ -310,6 +337,11 @@ export default {
     resize: vertical;
     max-height: 100px;
     min-height: 50px;
+}
+
+.liked-transtion {
+    transition: opacity 0.2s ease-in-out;
+    transition-delay: 0.5s;
 }
 
 .div-img {
@@ -367,8 +399,8 @@ export default {
 }
 
 .card-body>.d-flex {
-    margin-bottom: 1rem;
-    padding: 1rem;
+
+    padding: 0.3rem;
 }
 
 .card {

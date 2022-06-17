@@ -12,10 +12,12 @@ export default {
 p {
   color: white !important;
 }
+
 h {
   color: white !important;
 }
+
 body {
- background-color: #FFD7D7 !important;
+  background-color: #FFD7D7 !important;
 }
 </style>
