@@ -146,6 +146,7 @@ export default {
             })
                 .then(() => {
                     this.getPosts();
+                    alert("Votre commentaire a bien été modifié !");
                 })
                 .catch((error) => {
                     console.log({ error });
@@ -192,14 +193,14 @@ export default {
     <div class=" align-card form-wall d-flex mt-2">
         <div class="card mb-3 d-flex p-2 ">
             <form action="#" method="post" @submit.prevent="createPost">
-                <textarea v-model="newposts.commentary" name="textarea" aria-label="Poster votre commentaire"
-                    maxlength="150" rows="2" cols="60" placeholder="Publier un nouveau commentaire"
-                    data-v-133ed8df=""></textarea>
+                <textarea class="size-textarea" v-model="newposts.commentary" name="textarea"
+                    aria-label="Poster votre commentaire" maxlength="150" rows="2" cols="60"
+                    placeholder="Publier un nouveau commentaire" data-v-133ed8df=""></textarea>
                 <br />
                 <input class="  btn btn-primary" aria-label="Post d'un commentaire" type="submit" name="submitInfo"
                     value="Publier le commentaire" />
                 <div class="form-group">
-                    <input type="file" accept="image/png, image/jpeg" class="form-control-file "
+                    <input type="file" accept="image/png, image/jpeg" class="form-control-file"
                         aria-label="Publication une image" id="postImage" />
                 </div>
                 <hr class="dropdown-divider" />
@@ -209,7 +210,8 @@ export default {
 
     <!--  POST HER  -->
 
-    <div class="align-card form-wall m-1" :post="post" v-for="post in posts.slice().reverse()" v-bind:value="posts">
+    <div class="align-card form-wall m-1 new-wall" :post="post" v-for="post in posts.slice().reverse()"
+        v-bind:value="posts">
         <div class="card mb-3 d-flex p-2 ">
             <div class="card-header">
                 <div class="d-flex gap-2">
@@ -218,20 +220,24 @@ export default {
                     </div>
                 </div>
             </div>
-            <img v-if="post.imageUrl" :src="post.imageUrl" class="card-img-top" alt="...">
+
             <div class="card-body">
                 <p class="card-text none-bold" v-if="!showedit">{{ post.commentary }}</p>
-
+                <div class="div-img">
+                    <img v-if="post.imageUrl" :src="post.imageUrl" class="card-img-top image-size" max-width="50%"
+                        alt="post.imageUrl">
+                </div>
                 <!-- EDIT COMMENT HER -->
 
                 <form v-if="showedit" @submit.prevent="editPost(post)">
                     <div class="d-flex p-1 gap-2 mt-1 mb-3">
-                        <textarea v-model="editpost" name="textarea" aria-label="Poster une réponse" maxlength="150"
-                            rows="2" cols="90" placeholder="Modifier votre message" data-v-133ed8df=""></textarea>
+                        <textarea class="size-textarea" v-model="editpost" name="textarea"
+                            aria-label="Poster une réponse" maxlength="150" rows="2" cols="90"
+                            placeholder="Modifier votre message" data-v-133ed8df=""></textarea>
                         <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Modifier"
                             aria-label="submit post">
                         <input v-on:click="showedit = false" class="btn btn-secondary ms-auto" type="button"
-                            name="backedit" value="Annuler" aria-label="showeditfalse">
+                            name="backedit" value="Fermer" aria-label="showeditfalse">
                     </div>
                     <input type="file" accept="image/png, image/jpeg" class="form-control-file mb-3"
                         aria-label="Publication une image" />
@@ -268,9 +274,9 @@ export default {
             </div>
             <form action="#" method="post" @submit.prevent="createComment(post)">
                 <div class="d-flex p-1 gap-2 mt-3">
-                    <textarea v-model="commentposts.commentary" name="textarea" aria-label="Poster une réponse"
-                        maxlength="150" rows="2" cols="90" id="floatingTextarea" placeholder="Votre Réponse"
-                        data-v-133ed8df=""></textarea>
+                    <textarea class="size-textarea" v-model="commentposts.commentary" name="textarea"
+                        aria-label="Poster une réponse" maxlength="150" rows="2" cols="90" id="floatingTextarea"
+                        placeholder="Votre Réponse" data-v-133ed8df=""></textarea>
                     <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Envoyer"
                         aria-label="submit post">
                 </div>
@@ -297,7 +303,21 @@ export default {
     border-bottom: 1px solid rgba(0, 0, 0, 0.267);
 }
 
+.size-textarea {
+    display: block;
+    width: -webkit-fill-available !important;
+    width: -moz-available !important;
+    resize: vertical;
+    max-height: 100px;
+    min-height: 50px;
+}
 
+.div-img {
+    max-width: 500px;
+    margin: auto;
+    display: flex;
+    margin-bottom: 2rem;
+}
 
 #btn-color {
     color: white !important;
@@ -355,10 +375,7 @@ export default {
     background-color: #4E5166 !important;
 }
 
-.card-body>.d-flex {
-    margin-bottom: 1rem;
-    padding: 1rem;
-}
+
 
 .d-flex p:nth-child(1) {
     font-weight: bold;

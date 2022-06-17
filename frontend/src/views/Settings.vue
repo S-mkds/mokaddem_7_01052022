@@ -55,7 +55,7 @@ export default {
 
 <template>
     <LogoutNavbar></LogoutNavbar>
-    <div class="card d-flex p-2 mx-auto w-100 m-3 " data-v-649c4a52="">
+    <div class="card d-flex p-2 mx-auto w-100 m-3 size-card " data-v-649c4a52="">
         <h1 class="mx-auto">Entrez un nouveau pseudo ou supprimer le compte</h1>
         <div class="d-flex flex-column gap-1 p-1 comment " id="border-res">
             <p class="mx-auto font-weight-bold" id="name-response">Pseudo </p>
@@ -72,10 +72,6 @@ export default {
 </template>
 
 <style scoped>
-.new-w {
-    width: 50rem !important;
-}
-
 body {
     font-family: 'Lato', sans-serif;
 }
@@ -97,6 +93,11 @@ label {
     width: 50% !important;
 }
 
+.size-card {
+    max-width: 100%;
+    width: 70rem !important;
+}
+
 .btn-send {
     font-weight: 300;
     text-transform: uppercase;
@@ -109,6 +110,12 @@ label {
     color: #ff5050;
     margin-top: 5px;
 
+}
+
+@media (min-width:1281px) {
+    .new-w {
+        width: 50rem !important;
+    }
 }
 
 .card {
