@@ -13,8 +13,7 @@ export default {
         return {
             moment: moment,
             createAt: "",
-            oneLike: "",
-            likes: "",
+            likePost: "",
             usersLiked: [],
             btnLike: false,
             pseudo: "",
@@ -55,7 +54,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    alert("echec de réception");
+                    alert("Une erreur est survenue lors de l'envoi de la publication.");
                 });
         },
 
@@ -77,6 +76,7 @@ export default {
                         })
                             .then(response2 => {
                                 post.user = response2.data;
+                                console.log(response2)
                             })
                         await axios.get(`http://localhost:3000/api/posts/${post._id}/comments`, {
                             headers: {
@@ -99,7 +99,7 @@ export default {
                     });
                 })
                 .catch(err => {
-                    alert("echec de réception");
+                    alert("Une erreur est survenue lors la réception ! ");
                 });
         },
 
@@ -120,12 +120,12 @@ export default {
                     }
                 })
                 .catch(err => {
-                    alert("echec de réception");
+                    alert("Vérifier que la zone de texte n'est pas vide, une erreur est survenue !");
                 });
         },
 
 
-        // SUPPRIMER LE POST
+        // SUPPRIMER LE POST & COMMENTAIRE
         deletePost(post) {
             axios.delete(`http://localhost:3000/api/posts/${post._id}`, {
                 headers: {
@@ -184,16 +184,19 @@ export default {
 
         // LIKER LE POST
         liked(post) {
-            post.commentary = this.likes;
-            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, this.likes, {
+            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, post, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
             })
-                .then(() => {
+                .then(res => {
+                    this.getPosts();
+                    console.log(res)
                 })
+                .then(data => this.usersLiked.push(data))
                 .catch(err => {
                     alert("echec de réception");
+                    console.log(err)
                 });
         },
     },
@@ -219,6 +222,24 @@ export default {
 
 <template>
     <LogoutNav></LogoutNav>
+    <!-- TEST SPAN ****************************************************** -->
+    <!-- error span -->
+
+    <!-- <div class=" align-card form-wall d-flex mt-2">
+        <span class="error-span">Une erreur est survenue lors de l'envoie vérifier que le champ est bien
+            rempli
+            !</span>
+    </div> -->
+
+    <!-- Valid span -->
+
+    <!-- <div class=" align-card form-wall d-flex mt-2">
+        <span class="valid-span">Message bien enregistré
+            !</span>
+    </div> -->
+
+    <!-- TEST SPAN ****************************************************** -->
+
     <!-- Create NEW POST commentary her -->
     <div class=" align-card form-wall d-flex mt-2">
         <div class="card mb-3 d-flex p-2 ">
@@ -283,12 +304,15 @@ export default {
                 <!-- LIKE HER -->
                 <div class="d-flex justify-content-evenly">
                     <div>
-                        <button class="btn" v-if="!btnLike" v-on:click="btnLike = true" id="btn-color"> <img
-                                id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30"> 0
+                        <button class="btn" v-if="!btnLike" v-on:click="btnLike = true, liked(post)" id="btn-color">
+                            <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
+                            {{ usersLiked.length }}
                         </button>
 
-                        <button class="btn liked-transtion" v-if="btnLike" v-on:click="btnLike = false" id="btn-color">
-                            <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30"> 1
+                        <button class="btn liked-transtion" v-if="btnLike" v-on:click.prevent="btnLike = false"
+                            id="btn-color">
+                            <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30">
+                            {{ usersLiked.length }}
                         </button>
                     </div>
                     <!-- MODIFY HER -->
@@ -340,6 +364,14 @@ export default {
 <style scoped>
 .border-date {
     border-top: 1px solid rgba(0, 0, 0, 0.267) !important;
+}
+
+.valid-span {
+    color: green;
+}
+
+.error-span {
+    color: red !important;
 }
 
 .none-bold {
