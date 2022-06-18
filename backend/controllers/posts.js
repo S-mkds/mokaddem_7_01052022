@@ -78,6 +78,12 @@ exports.deletePost = (req, res, next) => {
     .then(() => res.status(200).json({ message: "Message supprimée !" }))
     .catch((error) => res.status(400).json({ error }));
 };
+exports.deleteComments = (req, res, next) => {
+  comment
+    .deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: "Commentaire supprimée !" }))
+    .catch((error) => res.status(400).json({ error }));
+};
 
 exports.getPostComments = (req, res, next) => {
   comment

@@ -18,6 +18,7 @@
     "bootstrap-vue-3": "^0.1.13",
     "core-js": "^3.22.7",
     "moment": "^2.29.3",
+    "moment-with-locales-es6": "^1.0.1",
     "sass": "^1.52.1",
     "scss": "^0.2.4",
     "vee-validate": "^4.5.11",

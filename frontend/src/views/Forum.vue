@@ -2,6 +2,8 @@
 import axios from 'axios';
 import LogoutNav from '../components/layout/LogoutNav.vue';
 import moment from "moment";
+import fr from 'moment/dist/locale/fr';
+
 
 
 export default {
@@ -11,7 +13,9 @@ export default {
         return {
             moment: moment,
             createAt: "",
-            likes: [],
+            oneLike: "",
+            likes: "",
+            usersLiked: [],
             btnLike: false,
             pseudo: "",
             token: "",
@@ -44,7 +48,7 @@ export default {
                 }
             })
                 .then(response => {
-                    // console.log(response.data);
+                    console.log(response.data);
                     if (!response.data.error) {
                         alert(response.data.message);
                         this.getPosts();
@@ -122,7 +126,7 @@ export default {
 
 
         // SUPPRIMER LE POST
-        deleteComment(post) {
+        deletePost(post) {
             axios.delete(`http://localhost:3000/api/posts/${post._id}`, {
                 headers: {
                     authorization: "Bearer " + this.token
@@ -137,6 +141,23 @@ export default {
                     else {
                         alert("Vous n'êtes pas l'auteur de ce post")
                     }
+                }
+                )
+                .catch((error) => {
+                    console.log({ error });
+                });
+        },
+
+        deleteComment(comment) {
+            axios.delete(`http://localhost:3000/api/posts/${comment._id}/comments`, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+
+                .then(() => {
+                    this.getPosts();
+                    alert("Votre commentaire a bien été supprimé !");
                 }
                 )
                 .catch((error) => {
@@ -163,38 +184,35 @@ export default {
 
         // LIKER LE POST
         liked(post) {
+            post.commentary = this.likes;
             axios.post(`http://localhost:3000/api/posts/${post._id}/like`, this.likes, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
             })
                 .then(() => {
-
                 })
                 .catch(err => {
                     alert("echec de réception");
                 });
         },
-
     },
 
     // MONTER LES ELEMENTS SI L'UTILISATEUR EST CONNECTEE
     mounted() {
+        moment.locale('fr', fr);
         const userLogin = JSON.parse(localStorage.getItem("userLogin"));
         if (userLogin) {
             this.newposts.userId = userLogin.userId;
             this.commentposts.userId = userLogin.userId;
             this.token = userLogin.token;
-            this.userId = userLogin.userId
+            this.userId = userLogin.userId;
             this.getPosts();
         }
         else {
             this.$router.push("/login");
         }
     },
-    created() {
-        moment.locale('fr')
-    }
 }
 
 </script>
@@ -206,11 +224,11 @@ export default {
         <div class="card mb-3 d-flex p-2 ">
             <form action="#" method="post" @submit.prevent="createPost">
                 <textarea class="size-textarea" v-model="newposts.commentary" name="textarea"
-                    aria-label="Poster votre commentaire" maxlength="150" rows="2" cols="60"
-                    placeholder="Publier un nouveau commentaire" data-v-133ed8df=""></textarea>
+                    aria-label="nouveau commentaire" maxlength="150" rows="2" cols="60"
+                    placeholder=" Écrire ici votre nouveau commentaire" data-v-133ed8df=""></textarea>
                 <br />
                 <input class="  btn btn-primary" aria-label="Post d'un commentaire" type="submit" name="submitInfo"
-                    value="Publier le commentaire" />
+                    value="Poster une nouvelle publication" />
                 <div class="form-group">
                     <input type="file" accept="image/png, image/jpeg" class="form-control-file"
                         aria-label="Publication une image" id="postImage" />
@@ -244,9 +262,9 @@ export default {
 
                 <form v-if="showedit" @submit.prevent="editPost(post)">
                     <div class="d-flex p-1 gap-2 mt-1 mb-3">
-                        <textarea class="size-textarea" v-model="editpost" name="textarea"
-                            aria-label="Poster une réponse" maxlength="150" rows="2" cols="90"
-                            placeholder="Modifier votre message" data-v-133ed8df=""></textarea>
+                        <textarea class="size-textarea" v-model="editpost" name="textarea" aria-label="Modifié le post"
+                            maxlength="150" rows="2" cols="90" placeholder="Modifier votre message"
+                            data-v-133ed8df=""></textarea>
                         <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Modifier"
                             aria-label="submit post">
                         <input v-on:click="showedit = false" class="btn btn-secondary ms-auto" type="button"
@@ -276,12 +294,12 @@ export default {
                     <!-- MODIFY HER -->
                     <div>
                         <button class="btn" id="btn-color" @click.prevent="showedit = true, editpost = post.commentary">
-                            <img src="..\assets\logo/edit-svgrepo-com.svg" alt="edit" width="40" height="30"> </button>
+                            <img src="..\assets\logo/edit-svgrepo.svg" alt="edit" width="40" height="30"> </button>
                     </div>
                     <!-- DELETE HER -->
                     <div>
-                        <button class="btn " id="btn-color" type="submit" @click="deleteComment(post)">
-                            <img src="..\assets\logo/delete-svgrepo-com.svg" alt="delete" width="40" height="30">
+                        <button class="btn " id="btn-color" type="submit" @click="deletePost(post)">
+                            <img src="..\assets\logo/remove-delete-svgrepo-com.svg" alt="delete" width="40" height="30">
                         </button>
                     </div>
 
@@ -298,12 +316,18 @@ export default {
                     }}</p>
                     <p class="p-1">{{ comment.commentary }} </p>
                 </div>
+                <!-- DELETE COMMENT HER -->
+                <div class="d-flex justify-content-start-end">
+                    <button class="btn " id="btn-color" type="submit" @click="deleteComment(comment)">
+                        <img src="..\assets\logo/remove-delete-svgrepo-com.svg" alt="delete" width="25" height="35">
+                    </button>
+                </div>
             </div>
             <form action="#" method="post" @submit.prevent="createComment(post)">
                 <div class="d-flex p-1 gap-2 mt-3">
                     <textarea class="size-textarea" v-model="commentposts.commentary" name="textarea"
-                        aria-label="Poster une réponse" maxlength="150" rows="2" cols="90" id="floatingTextarea"
-                        placeholder="Votre Réponse" data-v-133ed8df=""></textarea>
+                        aria-label="Poster un commentaire" maxlength="150" rows="2" cols="90" id="floatingTextarea"
+                        placeholder=" Écrire un commentaire" data-v-133ed8df=""></textarea>
                     <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Envoyer"
                         aria-label="submit post">
                 </div>
@@ -337,11 +361,13 @@ export default {
     resize: vertical;
     max-height: 100px;
     min-height: 50px;
+    white-space: pre-wrap !important;
+
 }
 
-.liked-transtion {
-    transition: opacity 0.2s ease-in-out;
-    transition-delay: 0.5s;
+.liked-transtion:active {
+    transition: opacity 1s ease-in-out;
+    transition-delay: 1s;
 }
 
 .div-img {
