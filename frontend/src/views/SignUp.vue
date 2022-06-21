@@ -35,9 +35,7 @@ export default {
             .then(response2 => response2.json())
             .then(response2 => {
               if (response2.error) throw (response2.error)
-              localStorage.setItem('pseudo', response2.pseudo);
-              localStorage.setItem('userId', response2.userId);
-              localStorage.setItem('token', response2.token);
+              localStorage.setItem("userLogin", JSON.stringify(response2));
               alert('Utilisateur enregistré')
               window.location.href = "/"
             })

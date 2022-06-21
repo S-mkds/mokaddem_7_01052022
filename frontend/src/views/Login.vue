@@ -57,7 +57,6 @@ export default {
         .then((res) => {
           if (res.status === 200) {
             localStorage.setItem("userLogin", JSON.stringify(res.data));
-            console.log(res);
             this.$router.push("/forum");
           }
         })

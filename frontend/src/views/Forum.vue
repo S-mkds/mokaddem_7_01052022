@@ -11,6 +11,8 @@ export default {
     components: { LogoutNav },
     data() {
         return {
+            admin: false,
+            likes: 0,
             moment: moment,
             createAt: "",
             likePost: "",
@@ -127,64 +129,72 @@ export default {
 
         // SUPPRIMER LE POST & COMMENTAIRE
         deletePost(post) {
-            axios.delete(`http://localhost:3000/api/posts/${post._id}`, {
-                headers: {
-                    authorization: "Bearer " + this.token
-                }
-            })
-
-                .then(() => {
-                    if (post = this.token) {
+            if (this.admin || this.userId == post.userId) {
+                axios.delete(`http://localhost:3000/api/posts/${post._id}`, {
+                    headers: {
+                        authorization: "Bearer " + this.token
+                    }
+                })
+                    .then(() => {
                         this.getPosts();
                         alert("Votre commentaire a bien été supprimé !");
                     }
-                    else {
-                        alert("Vous n'êtes pas l'auteur de ce post")
-                    }
-                }
-                )
-                .catch((error) => {
-                    console.log({ error });
-                });
+                    )
+                    .catch((error) => {
+                        console.log({ error });
+                    });
+            }
+            else {
+                alert("Vous n'êtes pas l'auteur de ce commentaire")
+            }
         },
 
         deleteComment(comment) {
-            axios.delete(`http://localhost:3000/api/posts/${comment._id}/comments`, {
-                headers: {
-                    authorization: "Bearer " + this.token
-                }
-            })
-
-                .then(() => {
-                    this.getPosts();
-                    alert("Votre commentaire a bien été supprimé !");
-                }
-                )
-                .catch((error) => {
-                    console.log({ error });
-                });
+            if (this.admin || this.userId == comment.userId) {
+                axios.delete(`http://localhost:3000/api/posts/${comment._id}/comments`, {
+                    headers: {
+                        authorization: "Bearer " + this.token
+                    }
+                })
+                    .then(() => {
+                        this.getPosts();
+                        alert("Votre commentaire a bien été supprimé !");
+                    }
+                    )
+                    .catch((error) => {
+                        console.log({ error });
+                    });
+            }
+            else {
+                alert("Vous n'êtes pas l'auteur de ce commentaire")
+            }
         },
 
         // MODIFIER LE POST
         editPost(post) {
-            post.commentary = this.editpost;
-            axios.put(`http://localhost:3000/api/posts/${post._id}`, post, {
-                headers: {
-                    authorization: "Bearer " + this.token
-                }
-            })
-                .then(() => {
-                    this.getPosts();
-                    alert("Votre commentaire a bien été modifié !");
+            if (this.admin || this.userId == post.userId) {
+                post.commentary = this.editpost;
+                axios.put(`http://localhost:3000/api/posts/${post._id}`, post, {
+                    headers: {
+                        authorization: "Bearer " + this.token
+                    }
                 })
-                .catch((error) => {
-                    console.log({ error });
-                });
+                    .then(() => {
+                        this.getPosts();
+                        alert("Votre commentaire a bien été modifié !");
+                    })
+                    .catch((error) => {
+                        console.log({ error });
+                    });
+            }
+            else {
+                alert("Vous n'êtes pas l'auteur de ce commentaire")
+            }
         },
 
         // LIKER LE POST
         liked(post) {
-            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, post, {
+            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: 1 }, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
@@ -192,8 +202,8 @@ export default {
                 .then(res => {
                     this.getPosts();
                     console.log(res)
+                    this.likes++;
                 })
-                .then(data => this.usersLiked.push(data))
                 .catch(err => {
                     alert("echec de réception");
                     console.log(err)
@@ -206,6 +216,7 @@ export default {
         moment.locale('fr', fr);
         const userLogin = JSON.parse(localStorage.getItem("userLogin"));
         if (userLogin) {
+            this.admin = userLogin.admin
             this.newposts.userId = userLogin.userId;
             this.commentposts.userId = userLogin.userId;
             this.token = userLogin.token;
@@ -224,19 +235,18 @@ export default {
     <LogoutNav></LogoutNav>
     <!-- TEST SPAN ****************************************************** -->
     <!-- error span -->
-
-    <!-- <div class=" align-card form-wall d-flex mt-2">
-        <span class="error-span">Une erreur est survenue lors de l'envoie vérifier que le champ est bien
-            rempli
-            !</span>
-    </div> -->
+    <div class=" align-card form-wall d-flex mt-2">
+        <div id="span200">
+            <span class="error-span">Une erreur est survenue lors de l'envoie !</span>
+        </div>
+    </div>
 
     <!-- Valid span -->
-
-    <!-- <div class=" align-card form-wall d-flex mt-2">
-        <span class="valid-span">Message bien enregistré
-            !</span>
-    </div> -->
+    <div class=" align-card form-wall d-flex mt-2">
+        <div id="span300">
+            <span class="valid-span">Message bien enregistré !</span>
+        </div>
+    </div>
 
     <!-- TEST SPAN ****************************************************** -->
 
@@ -306,18 +316,19 @@ export default {
                     <div>
                         <button class="btn" v-if="!btnLike" v-on:click="btnLike = true, liked(post)" id="btn-color">
                             <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
-                            {{ usersLiked.length }}
+                            {{ likes.length }}
                         </button>
 
                         <button class="btn liked-transtion" v-if="btnLike" v-on:click.prevent="btnLike = false"
                             id="btn-color">
                             <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30">
-                            {{ usersLiked.length }}
+                            {{ likes.length }}
                         </button>
                     </div>
                     <!-- MODIFY HER -->
                     <div>
-                        <button class="btn" id="btn-color" @click.prevent="showedit = true, editpost = post.commentary">
+                        <button class="btn" id="btn-color" v-if="admin || userId == post.userId"
+                            @click.prevent="showedit = true, editpost = post.commentary">
                             <img src="..\assets\logo/edit-svgrepo.svg" alt="edit" width="40" height="30"> </button>
                     </div>
                     <!-- DELETE HER -->
@@ -428,6 +439,10 @@ export default {
     width: 25px;
     height: 25px;
     border-radius: 50%;
+}
+
+#span200 {
+    background-color: red;
 }
 
 .comment {

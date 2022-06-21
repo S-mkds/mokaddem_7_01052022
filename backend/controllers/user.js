@@ -14,6 +14,7 @@ exports.signup = (req, res, next) => {
         ),
         password: hash,
         pseudo: req.body.pseudo,
+        admin: false,
       });
       user
         .save()
@@ -44,6 +45,7 @@ exports.login = (req, res, next) => {
             token: jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
               expiresIn: "24h",
             }),
+            admin: user.admin,
           });
         })
         .catch((error) => res.status(500).json({ error }));
