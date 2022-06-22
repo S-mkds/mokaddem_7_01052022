@@ -126,27 +126,8 @@ exports.likePost = (req, res, next) => {
               .then(() => res.status(200).json({ message: "Neutre" }))
               .catch((error) => res.status(400).json({ error }));
           }
-          if (post.usersDisliked.includes(userId)) {
-            Post.updateOne(
-              { _id: postId },
-              { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } }
-            )
-              .then(() => res.status(200).json({ message: "Neutre" }))
-              .catch((error) => res.status(400).json({ error }));
-          }
         })
         .catch((error) => res.status(404).json({ error }));
-      break;
-
-    case -1:
-      Post.updateOne(
-        { _id: postId },
-        { $push: { usersDisliked: userId }, $inc: { dislikes: +1 } }
-      )
-        .then(() => {
-          res.status(200).json({ message: "Dislike" });
-        })
-        .catch((error) => res.status(400).json({ error }));
       break;
 
     default:

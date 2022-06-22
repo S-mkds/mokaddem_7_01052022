@@ -11,7 +11,7 @@ const postRoutes = require("./routes/post.router");
 const commentRoutes = require("./routes/comment.router");
 
 // Database
-require("./models/database.js");
+require("./database.js");
 
 // Middleware
 app.use(express.json());

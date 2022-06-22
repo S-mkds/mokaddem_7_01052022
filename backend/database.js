@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const cryptoJS = require("crypto-js");
 // Connection on data base MongoDB with mongoose.connect
 const mongoose = require("mongoose"); // import de mongoose
-const User = require("./User");
+const User = require("./models/User");
 
 mongoose
   .connect(process.env.MONGODB_CONNECT, {

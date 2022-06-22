@@ -12,20 +12,24 @@ export default {
     data() {
         return {
             admin: false,
-            likes: 0,
+
             moment: moment,
             createAt: "",
-            likePost: "",
-            usersLiked: [],
+
+            likes: "",
             btnLike: false,
+
+            successMsg: false,
+            errorMsg: false,
+
             pseudo: "",
             token: "",
+
             posts: [],
             comments: [],
             showedit: false,
-            successMsg: false,
-            errorMsg: false,
             editpost: "",
+
             newposts: {
                 userId: "",
                 commentary: "",
@@ -70,7 +74,6 @@ export default {
                 }
             })
                 .then(response => {
-                    // console.log(response.data); 
                     this.posts = response.data
                     this.posts.forEach(async (post) => {
                         await axios.get(`http://localhost:3000/api/auth/${post.userId}`, {
@@ -80,7 +83,6 @@ export default {
                         })
                             .then(response2 => {
                                 post.user = response2.data;
-                                console.log(response2)
                             })
                         await axios.get(`http://localhost:3000/api/posts/${post._id}/comments`, {
                             headers: {
@@ -116,7 +118,6 @@ export default {
                 }
             })
                 .then(response => {
-                    console.log(response.data);
                     if (!response.data.error) {
                         alert(response.data.message);
                         this.getPosts();
@@ -178,8 +179,7 @@ export default {
                         authorization: "Bearer " + this.token
                     }
                 })
-                    .then((responseUser) => {
-                        console.log(responseUser.data)
+                    .then(() => {
                         this.getPosts();
                         alert("Utilisateur banni !");
                     }
@@ -216,16 +216,33 @@ export default {
         },
 
         // LIKER LE POST
-        liked(post) {
-            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: 1 }, {
+        like(post) {
+            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: +1 }, {
                 headers: {
                     authorization: "Bearer " + this.token
                 }
             })
                 .then(res => {
                     this.getPosts();
-                    console.log(res)
-                    this.likes + -1;
+                    console.log(res.data)
+                    this.likes = +1
+                })
+                .catch(err => {
+                    alert("echec de réception");
+                    console.log(err)
+                });
+        },
+        Unlike(post) {
+            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: 0 }, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+                .then(res => {
+                    this.getPosts();
+                    console.log(res.data)
+                    this.likes = 0;
+
                 })
                 .catch(err => {
                     alert("echec de réception");
@@ -279,7 +296,7 @@ export default {
             <form action="#" method="post" @submit.prevent="createPost">
                 <textarea class="size-textarea" v-model="newposts.commentary" name="textarea"
                     title="Le pseudo doit contenir une majuscule et au moins 1 à 20 caractères"
-                    aria-label="nouveau commentaire" maxlength="150" rows="2" cols="60"
+                    aria-label="nouveau commentaire" maxlength="350" rows="2" cols="60"
                     placeholder=" Écrire ici votre nouveau commentaire" data-v-133ed8df=""></textarea>
                 <br />
                 <input class="  btn btn-primary" aria-label="Post d'un commentaire" type="submit" name="submitInfo"
@@ -311,9 +328,11 @@ export default {
             </div>
 
             <div class="card-body">
-                <p class="card-text none-bold" v-if="!showedit">{{ post.commentary }}</p>
-                <div class="div-img">
-                    <img v-if="post.imageUrl" :src="post.imageUrl" class="card-img-top image-size" max-width="50%"
+                <div class="d-block p-2">
+                    <p class="card-text none-bold">{{ post.commentary }}</p>
+                </div>
+                <div class="div-img pt-3">
+                    <img v-if="post.imageUrl" :src="post.imageUrl" class="card-img-top image-size" max-width="55%"
                         alt="post.imageUrl">
                 </div>
 
@@ -321,7 +340,7 @@ export default {
 
                 <form v-if="showedit" @submit.prevent="editPost(post)">
                     <div class="d-flex p-1 gap-2 mt-1 mb-3">
-                        <textarea class="size-textarea" v-model="editpost" name="textarea" aria-label="Modifié le post"
+                        <textarea class="size-textarea" v-model="editpost" name="textarea" aria-label="Modifier le post"
                             maxlength="150" rows="2" cols="90" placeholder="Modifier votre message"
                             data-v-133ed8df=""></textarea>
                         <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Modifier"
@@ -340,18 +359,22 @@ export default {
                 }}
                     </small></p>
                 <!-- LIKE HER -->
+                <!-- ****************************************
+                ùùùùùùùùùùùùùùùùùùùùùùùùùùù
+                **************************
+                ùùùùùùùùùùùùùùùùùùùùùùù
+                *************************************************************************************** -->
                 <div class="d-flex justify-content-evenly">
                     <div>
-                        <button class="btn" v-if="!btnLike" v-on:click="post.btnLike = true, liked(post)"
-                            id="btn-color">
+                        <button class="btn" v-if="!btnLike" v-on:click="btnLike = true, like(post)" id=" btn-color">
                             <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
-                            {{ likes.length }}
+                            {{ likes }}
                         </button>
 
-                        <button class="btn liked-transtion" v-if="btnLike" v-on:click.prevent="btnLike = false"
-                            id="btn-color">
+                        <button class="btn liked-transtion" v-if="btnLike"
+                            v-on:click.prevent="btnLike = false, Unlike(post)" id="btn-color">
                             <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30">
-                            {{ likes.length }}
+                            {{ likes }}
                         </button>
                     </div>
                     <!-- MODIFY HER -->
@@ -372,7 +395,7 @@ export default {
 
 
             <!--  RESPONSE COMMENT HER  -->
-            <div class="d-flex gap-2 p-1 fs- text mb-2" id="border-res" :comment="comment"
+            <div class="d-flex gap-1 p-1 fs- text mb-2" id="border-res" :comment="comment"
                 v-for="comment in post.comments" v-bind:value="posts">
                 <div class="d-flex flex-column gap-1 p-1 comment  " id="border-res">
                     <p class="font-weight-bold pseudo-user p-2" id="name-response" v-if="comment.user">{{
@@ -392,7 +415,7 @@ export default {
                 </div>
             </div>
             <form action="#" method="post" @submit.prevent="createComment(post)">
-                <div class="d-flex p-1 gap-2 mt-3">
+                <div class="d-flex p-1 gap-1 mt-1">
                     <textarea class="size-textarea" v-model="commentposts.commentary" name="textarea"
                         aria-label="Poster un commentaire" maxlength="150" rows="2" cols="90" id="floatingTextarea"
                         placeholder=" Écrire un commentaire" data-v-133ed8df=""></textarea>
@@ -450,11 +473,14 @@ export default {
 }
 
 .div-img {
-    max-width: 500px;
+    max-width: 600px;
+    max-height: 800px;
     margin: auto;
     display: flex;
     margin-bottom: 2rem;
+    vertical-align: middle;
 }
+
 
 #btn-color {
     color: white !important;
