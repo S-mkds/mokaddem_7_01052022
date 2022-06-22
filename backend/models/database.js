@@ -15,14 +15,17 @@ mongoose
     User.findOne({ admin: true })
       .then(async (_admin) => {
         if (_admin == null) {
-          const adminPassword = await bcrypt.hash("admin", 10);
+          const adminPassword = await bcrypt.hash(
+            process.env.ADMIN_PASSWORD,
+            10
+          );
           const user = new User({
-            pseudo: "Administrateur Groupomania",
+            pseudo: process.env.ADMIN_PSEUDO,
             password: adminPassword,
             admin: true,
             email: cryptoJS.enc.Base64.stringify(
               cryptoJS.SHA512(
-                process.env.CRYPTO_SECRET_KEY + "Admin@groupomania.com"
+                process.env.CRYPTO_SECRET_KEY + process.env.ADMIN_EMAIL
               )
             ),
           });

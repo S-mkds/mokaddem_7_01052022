@@ -114,7 +114,6 @@ export default {
                 }
             })
                 .then(response => {
-
                     console.log(response.data);
                     if (!response.data.error) {
                         alert(response.data.message);
@@ -314,7 +313,8 @@ export default {
                 <!-- LIKE HER -->
                 <div class="d-flex justify-content-evenly">
                     <div>
-                        <button class="btn" v-if="!btnLike" v-on:click="btnLike = true, liked(post)" id="btn-color">
+                        <button class="btn" v-if="!post.btnLike" v-on:click="post.btnLike = true, liked(post)"
+                            id="btn-color">
                             <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
                             {{ likes.length }}
                         </button>
