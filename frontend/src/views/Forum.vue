@@ -23,6 +23,8 @@ export default {
             posts: [],
             comments: [],
             showedit: false,
+            successMsg: false,
+            errorMsg: false,
             editpost: "",
             newposts: {
                 userId: "",
@@ -49,10 +51,10 @@ export default {
                 }
             })
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (!response.data.error) {
-                        alert(response.data.message);
                         this.getPosts();
+                        alert("Publication enregistrée");
                     }
                 })
                 .catch(err => {
@@ -169,6 +171,28 @@ export default {
             }
         },
 
+        deleteUser(post) {
+            if (this.admin) {
+                axios.delete(`http://localhost:3000/api/auth/${post._id}`, {
+                    headers: {
+                        authorization: "Bearer " + this.token
+                    }
+                })
+                    .then((responseUser) => {
+                        console.log(responseUser.data)
+                        this.getPosts();
+                        alert("Utilisateur banni !");
+                    }
+                    )
+                    .catch((error) => {
+                        console.log({ error });
+                    });
+            }
+            else {
+                alert("Vous n'êtes pas un administrateur")
+            }
+        },
+
         // MODIFIER LE POST
         editPost(post) {
             if (this.admin || this.userId == post.userId) {
@@ -201,7 +225,7 @@ export default {
                 .then(res => {
                     this.getPosts();
                     console.log(res)
-                    this.likes++;
+                    this.likes + -1;
                 })
                 .catch(err => {
                     alert("echec de réception");
@@ -232,28 +256,29 @@ export default {
 
 <template>
     <LogoutNav></LogoutNav>
-    <!-- TEST SPAN ****************************************************** -->
-    <!-- error span -->
-    <div class=" align-card form-wall d-flex mt-2">
-        <div id="span200">
-            <span class="error-span">Une erreur est survenue lors de l'envoie !</span>
-        </div>
-    </div>
 
     <!-- Valid span -->
-    <div class=" align-card form-wall d-flex mt-2">
-        <div id="span300">
+    <!-- <div v-if="successSpan" class=" align-card form-wall d-flex dn-success" id="successMsg">
+        <div id="span200">
+            <img src="..\assets\logo/confirm-svgrepo-com.svg" alt="delete" width="40" height="30">
             <span class="valid-span">Message bien enregistré !</span>
         </div>
-    </div>
+    </div> -->
 
-    <!-- TEST SPAN ****************************************************** -->
+    <!-- error span -->
+    <!-- <div v-if="errorSpan" class=" align-card form-wall d-flex mt-2" id="errorMsg">
+        <div id="span400">
+            <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="40" height="30">
+            <span class="error-span">Erreur lors de la publication !</span>
+        </div>
+    </div> -->
 
     <!-- Create NEW POST commentary her -->
     <div class=" align-card form-wall d-flex mt-2">
         <div class="card mb-3 d-flex p-2 ">
             <form action="#" method="post" @submit.prevent="createPost">
                 <textarea class="size-textarea" v-model="newposts.commentary" name="textarea"
+                    title="Le pseudo doit contenir une majuscule et au moins 1 à 20 caractères"
                     aria-label="nouveau commentaire" maxlength="150" rows="2" cols="60"
                     placeholder=" Écrire ici votre nouveau commentaire" data-v-133ed8df=""></textarea>
                 <br />
@@ -276,7 +301,11 @@ export default {
             <div class="card-header">
                 <div class="d-flex gap-1">
                     <div class="d-flex flex-column ">
-                        <p id="name-commentary" v-if="post.user">{{ post.user.pseudo }}</p>
+                        <p id="name-commentary" v-if="post.user">{{ post.user.pseudo }}
+                            <button v-if="admin" class="btn p-1" id="btn-color" type="submit" @click="deleteUser()">
+                                <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="35" height="20">
+                            </button>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -300,8 +329,8 @@ export default {
                         <input v-on:click="showedit = false" class="btn btn-secondary ms-auto" type="button"
                             name="backedit" value="Fermer" aria-label="showeditfalse">
                     </div>
-                    <input type="file" accept="image/png, image/jpeg" class="form-control-file mb-3"
-                        aria-label="Publication une image" id="postImage" />
+                    <!-- <input type="file" accept="image/png, image/jpeg" class="form-control-file mb-3"
+                        aria-label="Publication une image" id="postImage" /> -->
                 </form>
 
 
@@ -313,7 +342,7 @@ export default {
                 <!-- LIKE HER -->
                 <div class="d-flex justify-content-evenly">
                     <div>
-                        <button class="btn" v-if="!post.btnLike" v-on:click="post.btnLike = true, liked(post)"
+                        <button class="btn" v-if="!btnLike" v-on:click="post.btnLike = true, liked(post)"
                             id="btn-color">
                             <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
                             {{ likes.length }}
@@ -348,7 +377,11 @@ export default {
                 <div class="d-flex flex-column gap-1 p-1 comment  " id="border-res">
                     <p class="font-weight-bold pseudo-user p-2" id="name-response" v-if="comment.user">{{
                             comment.user.pseudo
-                    }}</p>
+                    }}
+                        <button v-if="admin" class="btn " id="btn-color" type="submit" @click="deleteComment(comment)">
+                            <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="35" height="20">
+                        </button>
+                    </p>
                     <p class="p-1">{{ comment.commentary }} </p>
                 </div>
                 <!-- DELETE COMMENT HER -->
@@ -378,11 +411,14 @@ export default {
 }
 
 .valid-span {
-    color: green;
+    color: white;
+    font-weight: bold;
 }
 
 .error-span {
-    color: red !important;
+    color: white !important;
+    font-weight: bold;
+    background: none;
 }
 
 .none-bold {
@@ -442,7 +478,35 @@ export default {
 }
 
 #span200 {
-    background-color: red;
+    background: rgb(5, 94, 5);
+    padding: 1rem;
+    border-radius: 20px 20px;
+    position: fixed;
+    z-index: 1;
+}
+
+#span400 {
+    background: rgba(210, 7, 7);
+    padding: 1rem;
+    border-radius: 20px 20px;
+    position: fixed;
+    z-index: 1;
+}
+
+dn-success {
+    display: none;
+    animation-name: fadeOut;
+    animation-duration: .5s;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: .5
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .comment {

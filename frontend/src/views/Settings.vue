@@ -5,41 +5,11 @@ export default {
     name: "Profil",
     components: { LogoutNavbar },
     data() {
-        return {
-            token: "",
-            pseudo: "",
-            userId: "",
-            newpseudo: "",
-        };
     },
     methods: {
-        changePseudo() {
-            axios.get(`http://localhost:3000/api/auth/${userId}`, {
-                headers: {
-                    authorization: "Bearer " + this.token
-                }
-            })
-                .then(response => {
-                    this.userId = response.data
-                    console.log(response.data)
-                })
-                .catch(erreur => {
-                    alert("echec de réception");
-                });
-        },
-
 
     },
-    mounted() {
-        const userLogin = JSON.parse(localStorage.getItem("userLogin"));
-        if (userLogin) {
-            this.token = userLogin.token;
-            this.userId = userLogin.userId
-        }
-        else {
-            this.$router.push("/login");
-        }
-    },
+
 };
 
 </script>
@@ -57,7 +27,6 @@ export default {
             class="new-w mx-auto btn btn-warning btn-send  pt-2 btn-block" value="Enregistrer le pseudo">
         <input @click.prevent="deleteUser" type="submit"
             class=" new-w mx-auto btn btn-warning btn-send mt-1 pt-2 btn-block" value="Supprimer le compte">
-
     </div>
 
 </template>

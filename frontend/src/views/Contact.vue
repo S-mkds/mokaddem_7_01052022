@@ -1,15 +1,17 @@
 <script>
 import NavbarVue from '../components/layout/Navbar.vue';
+import LogoutNav from '../components/layout/LogoutNav.vue';
 
 export default {
     name: "contact",
-    components: { NavbarVue },
+    components: { NavbarVue, LogoutNav },
 }
 
 </script>
 
 <template>
     <NavbarVue></NavbarVue>
+    <!-- <LogoutNav></LogoutNav> -->
     <div class="container">
         <div class=" text-center mt-5 ">
             <h1>Formulaire de contact</h1>

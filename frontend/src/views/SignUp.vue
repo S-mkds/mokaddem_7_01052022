@@ -9,6 +9,7 @@ export default {
       pseudo: '',
       email: '',
       password: '',
+      password2: '',
       error: "",
     }
   },
@@ -78,16 +79,11 @@ export default {
 
       <div class="form-floating">
         <input type="password" class="form-control" id="password" placeholder="Password" v-model="password"
-          pattern="[A-Za-z0-9]{4,25}"
-          title="Le mot de passe doit contenir au moins 4 à 25 caractères, il est conseillé d'utiliser des majuscules ou des chiffres."
+          pattern="[A-Za-z0-9]{12,25}"
+          title="Le mot de passe doit contenir au moins 12 à 25 caractères, il est conseillé d'utiliser des majuscules ou des chiffres."
           required>
         <label for="password">Mot de passe</label>
       </div>
-
-      <!-- <div class="form-floating">
-      <input type="password2" class="form-control" id="convrm-password" placeholder="confirm-password" v-model="passwordValidate" pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[-+!*$@%_])([-+!*$@%_\w]{8,15})" required>
-      <label for="password2">Confirmation mot de passe</label>
-    </div> -->
 
       <button class="w-100 btn btn-lg btn-warning" type="submit">Inscription</button>
       <p class="my-3 text-danger">{{ error }}</p>
