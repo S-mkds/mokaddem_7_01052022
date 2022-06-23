@@ -74,10 +74,22 @@ exports.modifyPost = (req, res, next) => {
 };
 
 exports.deletePost = (req, res, next) => {
-  Post.deleteOne({ _id: req.params.id })
-    .then(() => res.status(200).json({ message: "Message supprimée !" }))
-    .catch((error) => res.status(400).json({ error }));
+  Post.findOne({ _id: req.params.id })
+    .then((post) => {
+      if ((post.imageUrl = true)) {
+        const filename = post.imageUrl.split("/images/")[1];
+        fs.unlink(`images/${filename}`, () => {
+          Post.deleteOne({ _id: req.params.id });
+        });
+      } else {
+        Post.deleteOne({ _id: req.params.id })
+          .then(() => res.status(200).json({ message: "Message supprimée !" }))
+          .catch((error) => res.status(400).json({ error }));
+      }
+    })
+    .catch((error) => res.status(500).json({ error }));
 };
+
 exports.deleteComments = (req, res, next) => {
   comment
     .deleteOne({ _id: req.params.id })

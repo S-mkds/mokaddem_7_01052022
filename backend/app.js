@@ -16,7 +16,8 @@ require("./database.js");
 // Middleware
 app.use(express.json());
 // app.use(cors()); // CORS est un package node.js pour fournir un middleware Connect/Express qui peut être utilisé pour activer CORS avec diverses options.
-app.use(helmet()); // aide à protéger votre application de certaines des vulnérabilités bien connues du Web en configurant de manière appropriée des en-têtes HTTP
+// app.use(helmet()); // aide à protéger votre application de certaines des vulnérabilités bien connues du Web en configurant de manière appropriée des en-têtes HTTP
+
 app.use(mongoSanitize()); // middleware qui nettoie les données fournies par l'utilisateur pour empêcher l'injection d'opérateur MongoDB.
 
 // accés à l'API depuis n'importe quelle origine
