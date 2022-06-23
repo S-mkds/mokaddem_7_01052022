@@ -109,6 +109,28 @@ export default {
                 });
         },
 
+        deleteUser(post) {
+            if (this.admin) {
+                axios.delete(`http://localhost:3000/api/auth/${post._id}`, {
+                    headers: {
+                        authorization: "Bearer " + this.token
+                    }
+                })
+                    .then((resUser) => {
+                        console.log(resUser)
+                        this.getPosts();
+                        alert("Utilisateur banni !");
+                    }
+                    )
+                    .catch((error) => {
+                        console.log({ error });
+                    });
+            }
+            else {
+                alert("Vous n'êtes pas un administrateur")
+            }
+        },
+
         // CREATION DES REPONSES COMMENTAIRES
         createComment(post) {
             this.commentposts.postId = post._id;
@@ -129,7 +151,7 @@ export default {
         },
 
 
-        // SUPPRIMER LE POST & COMMENTAIRE
+        // SUPPRIMER LE POST OU COMMENTAIRE OU L'UTILISATEUR
         deletePost(post) {
             if (this.admin || this.userId == post.userId) {
                 axios.delete(`http://localhost:3000/api/posts/${post._id}`, {
@@ -172,27 +194,6 @@ export default {
             }
         },
 
-        deleteUser(post) {
-            if (this.admin) {
-                axios.delete(`http://localhost:3000/api/auth/${post._id}`, {
-                    headers: {
-                        authorization: "Bearer " + this.token
-                    }
-                })
-                    .then(() => {
-                        this.getPosts();
-                        alert("Utilisateur banni !");
-                    }
-                    )
-                    .catch((error) => {
-                        console.log({ error });
-                    });
-            }
-            else {
-                alert("Vous n'êtes pas un administrateur")
-            }
-        },
-
         // MODIFIER LE POST
         editPost(post) {
             if (this.admin || this.userId == post.userId) {
@@ -225,7 +226,7 @@ export default {
                 .then(res => {
                     this.getPosts();
                     console.log(res.data)
-                    this.likes = +1
+                    console.log("===")
                 })
                 .catch(err => {
                     alert("echec de réception");
@@ -241,8 +242,6 @@ export default {
                 .then(res => {
                     this.getPosts();
                     console.log(res.data)
-                    this.likes = 0;
-
                 })
                 .catch(err => {
                     alert("echec de réception");
@@ -360,21 +359,20 @@ export default {
                     </small></p>
                 <!-- LIKE HER -->
                 <!-- ****************************************
-                ùùùùùùùùùùùùùùùùùùùùùùùùùùù
                 **************************
-                ùùùùùùùùùùùùùùùùùùùùùùù
                 *************************************************************************************** -->
                 <div class="d-flex justify-content-evenly">
                     <div>
-                        <button class="btn" v-if="!btnLike" v-on:click="btnLike = true, like(post)" id=" btn-color">
+                        <button class="btn" v-if="!btnLike" v-on:click.prevent="btnLike = true, like(post)"
+                            id=" btn-color">
                             <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
-                            {{ likes }}
+                            {{ post.likes }}
                         </button>
 
                         <button class="btn liked-transtion" v-if="btnLike"
                             v-on:click.prevent="btnLike = false, Unlike(post)" id="btn-color">
                             <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30">
-                            {{ likes }}
+                            {{ post.likes }}
                         </button>
                     </div>
                     <!-- MODIFY HER -->
@@ -385,7 +383,8 @@ export default {
                     </div>
                     <!-- DELETE HER -->
                     <div>
-                        <button class="btn " id="btn-color" type="submit" @click="deletePost(post)">
+                        <button class="btn " id="btn-color" type="submit" v-if="admin || userId == post.userId"
+                            @click="deletePost(post)">
                             <img src="..\assets\logo/remove-delete-svgrepo-com.svg" alt="delete" width="40" height="30">
                         </button>
                     </div>
@@ -409,7 +408,8 @@ export default {
                 </div>
                 <!-- DELETE COMMENT HER -->
                 <div class="d-flex justify-content-start-end">
-                    <button class="btn " id="btn-color" type="submit" @click="deleteComment(comment)">
+                    <button class="btn " id="btn-color" type="submit" v-if="admin || userId == comment.userId"
+                        @click="deleteComment(comment)">
                         <img src="..\assets\logo/remove-delete-svgrepo-com.svg" alt="delete" width="25" height="35">
                     </button>
                 </div>
@@ -429,20 +429,15 @@ export default {
 
 
 <style scoped>
+.align-card {
+    margin: auto !important;
+    max-width: min-content !important;
+}
+
 .border-date {
     border-top: 1px solid rgba(0, 0, 0, 0.267) !important;
 }
 
-.valid-span {
-    color: white;
-    font-weight: bold;
-}
-
-.error-span {
-    color: white !important;
-    font-weight: bold;
-    background: none;
-}
 
 .none-bold {
     font-weight: normal !important;
@@ -464,13 +459,8 @@ export default {
     max-height: 100px;
     min-height: 50px;
     white-space: pre-wrap !important;
-
 }
 
-.liked-transtion:active {
-    transition: opacity 1s ease-in-out;
-    transition-delay: 1s;
-}
 
 .div-img {
     max-width: 600px;
@@ -519,8 +509,19 @@ export default {
     z-index: 1;
 }
 
+.valid-span {
+    color: white;
+    font-weight: bold;
+}
+
+.error-span {
+    color: white !important;
+    font-weight: bold;
+    background: none;
+}
+
 dn-success {
-    display: none;
+
     animation-name: fadeOut;
     animation-duration: .5s;
 }
