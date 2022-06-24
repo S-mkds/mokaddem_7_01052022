@@ -66,5 +66,6 @@ exports.deleteUser = (req, res, next) => {
     User.deleteOne({ req: req.params.id })
       .then(() => res.status(200).json(user))
       .catch((error) => res.status(400).json({ error }));
+    console.log(req);
   });
 };

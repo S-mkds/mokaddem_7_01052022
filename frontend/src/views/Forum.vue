@@ -337,7 +337,7 @@ export default {
                 <input class="  btn btn-primary" aria-label="Post d'un commentaire" type="submit" name="submitInfo"
                     value="Poster une nouvelle publication" />
                 <div class="form-group">
-                    <input type="file" accept="image/png, image/jpeg" class="form-control-file"
+                    <input type="file" accept="image/png, image/jpeg,image/gif" class="form-control-file"
                         aria-label="Publication une image" id="postImage" />
                 </div>
                 <hr class="dropdown-divider" />

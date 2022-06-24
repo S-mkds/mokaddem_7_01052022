@@ -3,8 +3,7 @@ const fs = require("fs");
 
 exports.createComment = (req, res, next) => {
   const commentObject = req.body;
-  let userId = req.body.userId;
-  delete commentObject._id;
+
   const comment = new Comment({
     ...commentObject,
   });
@@ -46,17 +45,4 @@ exports.getOneComment = (req, res, next) => {
         error: error,
       });
     });
-};
-
-exports.deleteComment = (req, res, next) => {
-  Comment.findOne({ _id: req.params.id })
-    .then((comment) => {
-      const filename = comment.imageUrl.split("/images/")[1];
-      fs.unlink(`images/${filename}`, () => {
-        Comment.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: "Comment supprimée !" }))
-          .catch((error) => res.status(400).json({ error }));
-      });
-    })
-    .catch((error) => res.status(500).json({ error }));
 };
