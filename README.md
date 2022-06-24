@@ -5,7 +5,7 @@ Télécharger le repository et suivez les instructions ci-dessous.
 ## prérequis
 
 * Installer Node.js
-* Installer Express
+* Installer Express.js
 * Installer Vue.js
 * Crée une Database MongoDB
 

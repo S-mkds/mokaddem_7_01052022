@@ -13,9 +13,12 @@ mongoose
   .then(() => {
     console.log("Connexion Database réussie !");
     User.findOne({ admin: true })
-      .then((_admin) => {
+      .then(async (_admin) => {
         if (_admin == null) {
-          const adminPassword = bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+          const adminPassword = await bcrypt.hash(
+            process.env.ADMIN_PASSWORD,
+            10
+          );
           const user = new User({
             pseudo: process.env.ADMIN_PSEUDO,
             password: adminPassword,
@@ -29,7 +32,7 @@ mongoose
           user
             .save()
             .then(() => console.log("Un compte Administrateur a été crée."))
-            .catch(() =>
+            .catch((res) =>
               console.log(
                 "Echec lors de la création d'un compte Administrateur"
               )

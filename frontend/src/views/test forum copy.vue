@@ -220,7 +220,6 @@ export default {
 
         like(post) {
             if (post.userId) {
-
                 axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: +1 }, {
                     headers: {
                         authorization: "Bearer " + this.token
@@ -228,10 +227,6 @@ export default {
                 })
                     .then(res => {
                         this.getPosts();
-                        userId == post.userId
-                        this.likes = post
-                        post = this.showLike = true;
-
                     })
                     .catch(err => {
                         alert("echec de réception");
@@ -252,9 +247,6 @@ export default {
             })
                 .then(res => {
                     this.getPosts();
-                    this.likes = post
-
-                    this.showLike = false;
                 })
                 .catch(err => {
                     alert("echec de réception");
@@ -374,13 +366,14 @@ export default {
                 <!-- LIKE HER -->
                 <div class="d-flex justify-content-evenly">
                     <div>
-                        <button class="btn" v-if="!showLike" v-on:click.prevent="like(post)" id=" btn-color">
+                        <button class="btn" v-if="!showLike" v-on:click.prevent="showLike = true, like(post)"
+                            id=" btn-color">
                             <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
                             {{ post.likes }}
                         </button>
 
-                        <button class="btn liked-transtion" v-if="showLike" v-on:click.prevent="Unlike(post)"
-                            id="btn-color">
+                        <button class="btn liked-transtion" v-if="showLike"
+                            v-on:click.prevent="showLike = false, Unlike(post)" id="btn-color">
                             <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30">
                             {{ post.likes }}
                         </button>
@@ -394,7 +387,7 @@ export default {
                     <!-- DELETE HER -->
                     <div>
                         <button class="btn " id="btn-color" type="submit" v-if="admin || userId == post.userId"
-                            @click.prevent="deletePost(post)">
+                            @click="deletePost(post)">
                             <img src="..\assets\logo/remove-delete-svgrepo-com.svg" alt="delete" width="40" height="30">
                         </button>
                     </div>
