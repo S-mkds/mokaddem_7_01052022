@@ -21,6 +21,8 @@ export default {
 
             successMsg: false,
             errorMsg: false,
+            deleteMsg: false,
+            editMsg: false,
 
             pseudo: "",
             token: "",
@@ -58,11 +60,13 @@ export default {
                     // console.log(response.data);
                     if (!response.data.error) {
                         this.getPosts();
-                        alert("Publication enregistrée");
+                        this.successMsg = true
+                        setTimeout(() => this.successMsg = false, 2000);
                     }
                 })
                 .catch(err => {
-                    alert("Une erreur est survenue lors de l'envoi de la publication.");
+                    this.errorMsg = true
+                    setTimeout(() => this.errorMsg = false, 2000);
                 });
         },
 
@@ -105,7 +109,7 @@ export default {
                     });
                 })
                 .catch(err => {
-                    alert("Une erreur est survenue lors la réception ! ");
+                    alert("Une erreur est survenue lors la réception des données ! ");
                 });
         },
 
@@ -141,12 +145,14 @@ export default {
             })
                 .then(response => {
                     if (!response.data.error) {
-                        alert(response.data.message);
+                        this.successMsg = true
+                        setTimeout(() => this.successMsg = false, 2000);
                         this.getPosts();
                     }
                 })
                 .catch(err => {
-                    alert("Vérifier que la zone de texte n'est pas vide, une erreur est survenue !");
+                    this.errorMsg = true
+                    setTimeout(() => this.errorMsg = false, 2000);
                 });
         },
 
@@ -161,7 +167,8 @@ export default {
                 })
                     .then(() => {
                         this.getPosts();
-                        alert("Votre commentaire a bien été supprimé !");
+                        this.deleteMsg = true
+                        setTimeout(() => this.deleteMsg = false, 2000);
                     }
                     )
                     .catch((error) => {
@@ -182,7 +189,8 @@ export default {
                 })
                     .then(() => {
                         this.getPosts();
-                        alert("Votre commentaire a bien été supprimé !");
+                        this.deleteMsg = true
+                        setTimeout(() => this.deleteMsg = false, 2000);
                     }
                     )
                     .catch((error) => {
@@ -205,7 +213,9 @@ export default {
                 })
                     .then(() => {
                         this.getPosts();
-                        alert("Votre commentaire a bien été modifié !");
+                        this.showedit = false
+                        this.editMsg = true
+                        setTimeout(() => this.editMsg = false, 2000);
                     })
                     .catch((error) => {
                         console.log({ error });
@@ -221,16 +231,15 @@ export default {
         like(post) {
             if (post.userId) {
 
-                axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: +1 }, {
+                axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: +1, }, {
                     headers: {
                         authorization: "Bearer " + this.token
                     }
                 })
                     .then(res => {
                         this.getPosts();
-                        userId == post.userId
-                        this.likes = post
-                        post = this.showLike = true;
+                        this.post = this.like(post)
+                        this.showLike = true;
 
                     })
                     .catch(err => {
@@ -252,8 +261,6 @@ export default {
             })
                 .then(res => {
                     this.getPosts();
-                    this.likes = post
-
                     this.showLike = false;
                 })
                 .catch(err => {
@@ -287,20 +294,36 @@ export default {
     <LogoutNav></LogoutNav>
 
     <!-- Valid span -->
-    <!-- <div v-if="successSpan" class=" align-card form-wall d-flex dn-success" id="successMsg">
+    <div v-if="successMsg" class=" align-card form-wall d-flex dn-success" id="successMsg">
         <div id="span200">
             <img src="..\assets\logo/confirm-svgrepo-com.svg" alt="delete" width="40" height="30">
             <span class="valid-span">Message bien enregistré !</span>
         </div>
-    </div> -->
+    </div>
 
-    <!-- error span -->
-    <!-- <div v-if="errorSpan" class=" align-card form-wall d-flex mt-2" id="errorMsg">
+    <!-- Error span -->
+    <div v-if="errorMsg" class=" align-card form-wall d-flex mt-2" id="errorMsg">
         <div id="span400">
-            <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="40" height="30">
+            <img class="" src="..\assets\logo/delete-stop-post.svg" alt="delete" width="40" height="30">
             <span class="error-span">Erreur lors de la publication !</span>
         </div>
-    </div> -->
+    </div>
+
+    <!-- Delete span -->
+    <div v-if="deleteMsg" class=" align-card form-wall d-flex dn-success" id="successMsg">
+        <div id="span200">
+            <img class="" src="..\assets\logo/confirm-svgrepo-com.svg" alt="delete" width="40" height="30">
+            <span class="valid-span">Le commentaire a bien été supprimé ! </span>
+        </div>
+    </div>
+
+    <!-- Edit span -->
+    <div v-if="editMsg" class=" align-card form-wall d-flex dn-success" id="successMsg">
+        <div id="span200">
+            <img class="" src="..\assets\logo/confirm-svgrepo-com.svg" alt="delete" width="40" height="30">
+            <span class="valid-span">Votre commentaire a bien été modifié ! </span>
+        </div>
+    </div>
 
     <!-- Create NEW POST commentary her -->
     <div class=" align-card form-wall d-flex mt-2">
@@ -331,9 +354,9 @@ export default {
                 <div class="d-flex gap-1">
                     <div class="d-flex flex-column ">
                         <p id="name-commentary" v-if="post.user">{{ post.user.pseudo }}
-                            <!-- <button v-if="admin" class="btn p-1" id="btn-color" type="submit" @click="deleteUser()">
+                            <button v-if="admin" class="btn p-1" id="btn-color" type="submit" @click="deleteUser()">
                                 <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="35" height="20">
-                            </button> -->
+                            </button>
                         </p>
                     </div>
                 </div>
@@ -353,7 +376,7 @@ export default {
                 <form v-if="showedit" @submit.prevent="editPost(post)">
                     <div class="d-flex p-1 gap-2 mt-1 mb-3">
                         <textarea class="size-textarea" v-model="editpost" name="textarea" aria-label="Modifier le post"
-                            maxlength="150" rows="2" cols="90" placeholder="Modifier votre message"
+                            maxlength="350" rows="2" cols="90" placeholder="Modifier votre message"
                             data-v-133ed8df=""></textarea>
                         <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Modifier"
                             aria-label="submit post">
@@ -374,13 +397,12 @@ export default {
                 <!-- LIKE HER -->
                 <div class="d-flex justify-content-evenly">
                     <div>
-                        <button class="btn" v-if="!showLike" v-on:click.prevent="like(post)" id=" btn-color">
+                        <button class="btn font-bold" v-if="!showLike" v-on:click.prevent="like(post)" id=" btn-color">
                             <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
                             {{ post.likes }}
                         </button>
 
-                        <button class="btn liked-transtion" v-if="showLike" v-on:click.prevent="Unlike(post)"
-                            id="btn-color">
+                        <button class="btn font-bold" v-if="showLike" v-on:click.prevent="Unlike(post)" id="btn-color">
                             <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30">
                             {{ post.likes }}
                         </button>
@@ -427,7 +449,7 @@ export default {
             <form action="#" method="post" @submit.prevent="createComment(post)">
                 <div class="d-flex p-1 gap-1 mt-1">
                     <textarea class="size-textarea" v-model="commentposts.commentary" name="textarea"
-                        aria-label="Poster un commentaire" maxlength="150" rows="2" cols="90" id="floatingTextarea"
+                        aria-label="Poster un commentaire" maxlength="100" rows="2" cols="90" id="floatingTextarea"
                         placeholder=" Écrire un commentaire" data-v-133ed8df=""></textarea>
                     <input class="btn btn-primary ms-auto" type="submit" name="submitInfo" value="Envoyer"
                         aria-label="submit post">
@@ -439,9 +461,14 @@ export default {
 
 
 <style scoped>
+p {
+    white-space: pre-wrap !important;
+    max-width: 45rem !important;
+}
+
 .align-card {
     margin: auto !important;
-    max-width: min-content !important;
+    max-width: 60rem !important;
 }
 
 .border-date {
@@ -471,7 +498,6 @@ export default {
     white-space: pre-wrap !important;
 }
 
-
 .div-img {
     max-width: 600px;
     max-height: 800px;
@@ -481,10 +507,10 @@ export default {
     vertical-align: middle;
 }
 
-
-#btn-color {
+.btn {
     color: white !important;
 }
+
 
 #profile {
     width: 25px;
@@ -504,7 +530,7 @@ export default {
 }
 
 #span200 {
-    background: rgb(5, 94, 5);
+    background: rgb(7 93 7 / 77%);
     padding: 1rem;
     border-radius: 20px 20px;
     position: fixed;
@@ -512,7 +538,7 @@ export default {
 }
 
 #span400 {
-    background: rgba(210, 7, 7);
+    background: rgb(130 12 12 / 82%);
     padding: 1rem;
     border-radius: 20px 20px;
     position: fixed;
