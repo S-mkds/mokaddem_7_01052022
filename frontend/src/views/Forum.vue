@@ -87,6 +87,7 @@ export default {
                         })
                             .then(response2 => {
                                 post.user = response2.data;
+                                console.log(response2.data)
                             })
                         await axios.get(`http://localhost:3000/api/posts/${post._id}/comments`, {
                             headers: {
@@ -227,29 +228,21 @@ export default {
         },
 
         // LIKER LE POST
-
         like(post) {
-            if (post.userId) {
 
-                axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: +1, }, {
-                    headers: {
-                        authorization: "Bearer " + this.token
-                    }
+            axios.post(`http://localhost:3000/api/posts/${post._id}/like`, { userId: this.userId, like: +1, }, {
+                headers: {
+                    authorization: "Bearer " + this.token
+                }
+            })
+                .then(res => {
+                    this.getPosts();
+                    this.showLike = true;
                 })
-                    .then(res => {
-                        this.getPosts();
-                        this.post = this.like(post)
-                        this.showLike = true;
-
-                    })
-                    .catch(err => {
-                        alert("echec de réception");
-                        console.log(err)
-                    });
-            }
-            else {
-                alert("Impossible de liker deux fois ce commentaire");
-            }
+                .catch(err => {
+                    alert("echec de réception");
+                    console.log(err)
+                });
         },
 
 
@@ -330,7 +323,6 @@ export default {
         <div class="card mb-3 d-flex p-2 ">
             <form action="#" method="post" @submit.prevent="createPost">
                 <textarea class="size-textarea" v-model="newposts.commentary" name="textarea"
-                    title="Le pseudo doit contenir une majuscule et au moins 1 à 20 caractères"
                     aria-label="nouveau commentaire" maxlength="350" rows="2" cols="60"
                     placeholder=" Écrire ici votre nouveau commentaire" data-v-133ed8df=""></textarea>
                 <br />
@@ -346,7 +338,6 @@ export default {
     </div>
 
     <!--  POST HER  -->
-
     <div class="align-card form-wall m-1 new-wall" :post="post" v-for="post in posts.slice().reverse()"
         v-bind:value="posts">
         <div class="card mb-3 d-flex p-2 ">
@@ -354,14 +345,15 @@ export default {
                 <div class="d-flex gap-1">
                     <div class="d-flex flex-column ">
                         <p id="name-commentary" v-if="post.user">{{ post.user.pseudo }}
-                            <button v-if="admin" class="btn p-1" id="btn-color" type="submit" @click="deleteUser()">
+                            <!-- <button v-if="admin" class="btn p-1" id="btn-color" type="submit" @click="deletePost()">
                                 <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="35" height="20">
-                            </button>
+                            </button> -->
                         </p>
                     </div>
                 </div>
             </div>
 
+            <!-- Card her -->
             <div class="card-body">
                 <div class="d-block p-2">
                     <p class="card-text none-bold">{{ post.commentary }}</p>
@@ -372,7 +364,6 @@ export default {
                 </div>
 
                 <!-- EDIT COMMENT HER -->
-
                 <form v-if="showedit" @submit.prevent="editPost(post)">
                     <div class="d-flex p-1 gap-2 mt-1 mb-3">
                         <textarea class="size-textarea" v-model="editpost" name="textarea" aria-label="Modifier le post"
@@ -387,26 +378,29 @@ export default {
                         aria-label="Publication une image" id="postImage" /> -->
                 </form>
 
-
                 <!-- SET TIME HER -->
                 <p class="d-flex justify-content-end card-text border-date"><small class="fst-italic"> {{
                         moment(post.createdAt).fromNow()
                 }}
                     </small></p>
 
-                <!-- LIKE HER -->
+                <!-- LIKE +1 HER -->
                 <div class="d-flex justify-content-evenly">
                     <div>
-                        <button class="btn font-bold" v-if="!showLike" v-on:click.prevent="like(post)" id=" btn-color">
+                        <button class="btn font-bold" v-if="!post.usersLiked.find(_userId => _userId == userId)"
+                            v-on:click.prevent="like(post)" id=" btn-color">
                             <img id="svglike" src="..\assets\logo/heart-empty.svg" alt="edit" width="40" height="30">
                             {{ post.likes }}
                         </button>
 
-                        <button class="btn font-bold" v-if="showLike" v-on:click.prevent="Unlike(post)" id="btn-color">
+                        <!-- LIKE -1 HER -->
+                        <button class="btn font-bold" v-if="post.usersLiked.find(_userId => _userId == userId)"
+                            v-on:click.prevent="Unlike(post)" id="btn-color">
                             <img id="svglike" src="..\assets\logo/full-heart.svg" alt="edit" width="40" height="30">
                             {{ post.likes }}
                         </button>
                     </div>
+
                     <!-- MODIFY HER -->
                     <div>
                         <button class="btn" id="btn-color" v-if="admin || userId == post.userId"
@@ -432,12 +426,13 @@ export default {
                     <p class="font-weight-bold pseudo-user p-2" id="name-response" v-if="comment.user">{{
                             comment.user.pseudo
                     }}
-                        <button v-if="admin" class="btn " id="btn-color" type="submit" @click="deleteComment(comment)">
+                        <!-- <button v-if="admin" class="btn " id="btn-color" type="submit" @click="deleteComment(comment)">
                             <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="35" height="20">
-                        </button>
+                        </button> -->
                     </p>
                     <p class="p-1">{{ comment.commentary }} </p>
                 </div>
+
                 <!-- DELETE COMMENT HER -->
                 <div class="d-flex justify-content-start-end">
                     <button class="btn " id="btn-color" type="submit" v-if="admin || userId == comment.userId"
