@@ -15,46 +15,64 @@ export default {
   },
   methods: {
     signUpUser() {
-      let dataForm = JSON.stringify({ email: this.email, pseudo: this.pseudo, password: this.password });
-      fetch("http://localhost:3000/api/auth/signup", {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: dataForm,
-      })
-        .then(response => response.json())
-        .then(response => {
-          if (response.error) throw (response.error)
-          fetch("http://localhost:3000/api/auth/login", {
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json'
-            },
-            body: dataForm,
+      const regexPassword = /[A-Z]{1}[A-Za-z0-9]{1,20}/
+      const regexEmail = /^[a-z0-9!#$ %& '*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&' * +/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/g;
+      const regexPseudo = /[A-Z]{1}[A-Za-z0-9]{1,20}/;
+      let ErrMsg = document.getElementById("btn-submit").nextElementSibling;
+      if (
+        (this.email !== null ||
+          this.pseudo !== null ||
+          this.password !== null) &&
+        (regexPassword.test(this.password) && regexEmail.test(this.email) && regexPseudo.test(this.pseudo))
+      ) {
+
+        let dataForm = JSON.stringify({ email: this.email, pseudo: this.pseudo, password: this.password });
+        fetch("http://localhost:3000/api/auth/signup", {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: dataForm,
+        })
+          .then(response => response.json())
+          .then(response => {
+            if (response.error) throw (response.error)
+            fetch("http://localhost:3000/api/auth/login", {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json'
+              },
+              body: dataForm,
+            })
+              .then(response2 => response2.json())
+              .then(response2 => {
+                if (response2.error) throw (response2.error)
+                localStorage.setItem("userLogin", JSON.stringify(response2));
+                alert('Utilisateur enregistré')
+                window.location.href = "/"
+              })
+              .catch(err2 => {
+                alert("erreur lors de l'inscription")
+                console.log("erreur:", err2)
+                this.error =
+                  "Erreur: Vérifier vos identifiants lors de l'inscription";
+              })
+            console.log(response);
           })
-            .then(response2 => response2.json())
-            .then(response2 => {
-              if (response2.error) throw (response2.error)
-              localStorage.setItem("userLogin", JSON.stringify(response2));
-              alert('Utilisateur enregistré')
-              window.location.href = "/"
-            })
-            .catch(err2 => {
-              alert("erreur lors de l'inscription")
-              console.log("erreur:", err2)
-              this.error =
-                "Erreur: Vérifier vos identifiants lors de l'inscription";
-            })
-          console.log(response);
-        })
-        .catch(err => {
-          alert("erreur lors de l'inscription")
-          console.log("erreur:", err)
-          this.error =
-            "Erreur: Vérifier vos identifiants lors de l'inscription";
-        })
+          .catch(err => {
+            alert("erreur lors de l'inscription")
+            console.log("erreur:", err)
+            this.error =
+              "Erreur: Vérifier vos identifiants lors de l'inscription";
+          })
+      }
+
+      else {
+        ErrMsg.innerHTML = "Les informations saisies ne sont pas valide, veuillez saisir des informations valide !";
+        ErrMsg.style.color = "#fbbcbc";
+      }
     },
+
   }
 }
 </script>
@@ -73,7 +91,9 @@ export default {
       </div>
 
       <div class="form-floating">
-        <input type="email" class="form-control" id="email" placeholder="name@example.com" v-model="email" required>
+        <input type="email" class="form-control" id="email" placeholder="name@example.com" v-model="email"
+          title="exemple@gmail.com" required>
+
         <label for="email">Email</label>
       </div>
 
@@ -85,7 +105,7 @@ export default {
         <label for="password">Mot de passe</label>
       </div>
 
-      <button class="w-100 btn btn-lg btn-warning" type="submit">Inscription</button>
+      <button class="w-100 btn btn-lg btn-warning" id="btn-submit" type="submit">Inscription</button>
       <p class="my-3 text-danger">{{ error }}</p>
       <div class="text-center font-weight-bold">
         Avez-vous déja un compte ? <routerLink to="/"> <a href="#" class="color-a">login</a></routerLink>
