@@ -29,6 +29,7 @@ export default {
 
             posts: [],
             comments: [],
+
             showedit: false,
             editpost: "",
 
@@ -87,7 +88,7 @@ export default {
                         })
                             .then(response2 => {
                                 post.user = response2.data;
-                                console.log(response2.data)
+                                // console.log(response2.data)
                             })
                         await axios.get(`http://localhost:3000/api/posts/${post._id}/comments`, {
                             headers: {
@@ -114,27 +115,52 @@ export default {
                 });
         },
 
-        deleteUser(post) {
+        deleteOneUser(post) {
             if (this.admin) {
-                axios.delete(`http://localhost:3000/api/auth/${post._id}`, {
+                axios.delete(`http://localhost:3000/api/auth/${post.userId}`, {
                     headers: {
                         authorization: "Bearer " + this.token
                     }
                 })
-                    .then((resUser) => {
-                        console.log(resUser)
+                    .then((res) => {
+                        console.log(res)
                         this.getPosts();
                         alert("Utilisateur banni !");
                     }
                     )
+
                     .catch((error) => {
                         console.log({ error });
                     });
             }
             else {
-                alert("Vous n'êtes pas un administrateur")
+                alert("Vous n'êtes pas l'administrateur")
             }
         },
+
+        getOneUser(post) {
+            if (this.admin) {
+                axios.get(`http://localhost:3000/api/auth/${post.userId}`, {
+                    headers: {
+                        authorization: "Bearer " + this.token
+                    }
+                })
+                    .then((res) => {
+                        console.log(res)
+                        this.getPosts();
+                        alert("Utilisateur banni !");
+                    }
+                    )
+
+                    .catch((error) => {
+                        console.log({ error });
+                    });
+            }
+            else {
+                alert("Vous n'êtes pas l'administrateur")
+            }
+        },
+
 
         // CREATION DES REPONSES COMMENTAIRES
         createComment(post) {
@@ -345,7 +371,8 @@ export default {
                 <div class="d-flex gap-1">
                     <div class="d-flex flex-column ">
                         <p id="name-commentary" v-if="post.user">{{ post.user.pseudo }}
-                            <!-- <button v-if="admin" class="btn p-1" id="btn-color" type="submit" @click="deletePost()">
+                            <!-- <button v-if="admin" class="btn p-1" id="btn-color" type="submit"
+                                @click.prevent="deleteOneUser(post)">
                                 <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="35" height="20">
                             </button> -->
                         </p>

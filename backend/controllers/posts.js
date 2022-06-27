@@ -78,12 +78,12 @@ exports.deletePost = (req, res, next) => {
     .then((post) => {
       const filename = post.imageUrl.split("/images/")[1];
       fs.unlink(`images/${filename}`, () => {
-        Post.deleteOne({ _id: req.params.id });
         Post.deleteOne({ _id: req.params.id })
           .then(() => res.status(200).json({ message: "Message supprimée !" }))
           .catch((error) => res.status(400).json({ error }));
       });
     })
+
     .catch((error) => res.status(500).json({ error }));
 };
 
