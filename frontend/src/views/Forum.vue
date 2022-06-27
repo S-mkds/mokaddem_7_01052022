@@ -115,9 +115,9 @@ export default {
                 });
         },
 
-        deleteOneUser(post) {
+        deleteOneUser(user) {
             if (this.admin) {
-                axios.delete(`http://localhost:3000/api/auth/${post.userId}`, {
+                axios.delete(`http://localhost:3000/api/auth/${user._id}`, {
                     headers: {
                         authorization: "Bearer " + this.token
                     }
@@ -372,7 +372,7 @@ export default {
                     <div class="d-flex flex-column ">
                         <p id="name-commentary" v-if="post.user">{{ post.user.pseudo }}
                             <!-- <button v-if="admin" class="btn p-1" id="btn-color" type="submit"
-                                @click.prevent="deleteOneUser(post)">
+                                @click.prevent="deleteOneUser(post.user)">
                                 <img src="..\assets\logo/delete-stop-post.svg" alt="delete" width="35" height="20">
                             </button> -->
                         </p>

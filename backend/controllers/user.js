@@ -64,7 +64,6 @@ exports.getOneUser = (req, res, next) => {
 exports.deleteOneUser = (req, res, next) => {
   User.findById(req.params.id)
     .then((user) => {
-      res.status(200).json(user);
       User.deleteOne({ req: req.params.id })
         .then((user) => res.status(200).json(user))
         .catch((error) => res.status(400).json({ error }));
